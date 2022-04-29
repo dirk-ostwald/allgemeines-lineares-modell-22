@@ -164,8 +164,8 @@ Die \textit{Korrelation} zweier Zufallsvariablen $X$ und $Y$ ist definiert als
 \begin{equation}
 \rho(X,Y) := \frac{\mathbb{C}(X,Y)}{\mathbb{S}(X)\mathbb{S}(Y)}
 \end{equation}
-wobei $\mathbb{C}(X,Y)$ die Kovarianz von $X$ und $Y$ und $\mathbb{V}(X)$ und
-$\mathbb{V}(Y)$ die Varianzen von $X$ und $Y$, respektive, bezeichnen.
+wobei $\mathbb{C}(X,Y)$ die Kovarianz von $X$ und $Y$ und $\mathbb{S}(X)$ und
+$\mathbb{S}(Y)$ die Standardabweichungen von $X$ und $Y$, respektive, bezeichnen.
 \end{definition}
 
 \footnotesize
@@ -192,9 +192,9 @@ $\{(x_1,y_1),...,(x_n,y_n)\} \subset \mathbb{R}$ sei eine Wertemenge. Weiterhin 
 \end{equation}
 \item Die Stichprobenstandardabweichungen $x_i$ und $y_i$ definiert als
 \begin{equation}
-s_x := \sqrt{\frac{1}{n-1}(x_i - \bar{x})^2}
+s_x := \sqrt{\frac{1}{n-1}\sum_{i=1}^n(x_i - \bar{x})^2}
 \mbox{ und }
-s_y := \sqrt{\frac{1}{n-1}(y_i - \bar{y})^2}.
+s_y := \sqrt{\frac{1}{n-1}\sum_{i=1}^n(y_i - \bar{y})^2}.
 \end{equation}
 \item Die Stichprobenkovarianz der $(x_1,y_1),...,(x_n,y_n)$ definiert als
 \begin{equation}
@@ -236,6 +236,7 @@ print(r_xy)                                                                     
 ```
 
 \center
+\normalsize
 $\Rightarrow$ Anzahl Therapiestunden und Symptomreduktion sind hochkorreliert.
 
 # Grundlagen
@@ -348,7 +349,7 @@ Es gilt
 \begin{split}
 r_{\tilde{x}\tilde{y}} 
 & := \frac{\frac{1}{n-1}\sum_{i=1}^n (\tilde{x}_i - \bar{\tilde{x}})(\tilde{y}_i - \bar{\tilde{y}})}
-        {\sqrt{\frac{1}{n-1}(\sum_{i=1}^n\tilde{x}_i - \bar{\tilde{x}})^2} \sqrt{\frac{1}{n-1}(\sum_{i=1}^n\tilde{y}_i - \bar{\tilde{y}})^2}}
+        {\sqrt{\frac{1}{n-1}\sum_{i=1}^n(\tilde{x}_i - \bar{\tilde{x}})^2} \sqrt{\frac{1}{n-1}\sum_{i=1}^n(\tilde{y}_i - \bar{\tilde{y}})^2}}
 \\
 &  = \frac{\sum_{i=1}^n (a_x x_i + b_x - (a_x\bar{x} + b_x))(a_y y_i + b_y - (a_y \bar{y} + b_y))}
           {\sqrt{\sum_{i=1}^n (a_x x_i + b_x - (a_x \bar{x} + b_x))^2}\sqrt{\sum_{i=1}^n (a_y y_i + b_y - (a_y \bar{y} + b_y))^2}}

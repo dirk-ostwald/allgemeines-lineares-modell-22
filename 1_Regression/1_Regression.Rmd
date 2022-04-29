@@ -843,7 +843,7 @@ Y_i = \beta_0 + \beta_1x_i + \varepsilon_{i} \mbox{ mit } \varepsilon_i \sim N(0
 \end{equation}
 lässt sich äquivalent in der Form
 \begin{equation}\label{eq:modell_normal}
-Y_i \sim N\left(\beta_0 + \beta_1x_i, \sigma^2\right) \mbox{ u.i.v. für } i = 1,...,n
+Y_i \sim N\left(\beta_0 + \beta_1x_i, \sigma^2\right) \mbox{ u. für } i = 1,...,n
 \end{equation}
 schreiben.
 \end{theorem}
@@ -854,7 +854,7 @@ Bemerkungen
 
 * Wir bezeichnen 
 \begin{equation}
-Y_i \sim N\left(\beta_0 + \beta_1x_i, \sigma^2\right) \mbox{ u.i.v. für } i = 1,...,n
+Y_i \sim N\left(\beta_0 + \beta_1x_i, \sigma^2\right) \mbox{ u. für } i = 1,...,n
 \end{equation}
 als \textit{Normalverteilungsmodell der einfachen linearen Regression}.
 
