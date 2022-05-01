@@ -5,7 +5,6 @@
 - [Allgemeines lineares Modell (SoSe 2022)](#allgemeines-lineares-modell-sose-2022)
   - [Inhaltsverzeichnis](#inhaltsverzeichnis)
   - [Allgemeine Informationen](#allgemeine-informationen)
-    - [Was ist git/github?](#was-ist-gitgithub)
   - [Anleitung, wie man beitragen kann](#anleitung-wie-man-beitragen-kann)
     - [TLDR](#tldr)
     - [Schritt-für-Schritt Anleitung](#schritt-für-schritt-anleitung)
@@ -15,9 +14,6 @@
 
 ## Allgemeine Informationen
 Dieses Repository enthält alle Skripte zur Vorlesung "Allgemeines lineares Modell" im SoSe 2022 von Prof. Dirk Ostwald an der OVGU Magdeburg.
-
-### Was ist git/github?
-to be filled
 
 ## Anleitung, wie man beitragen kann
 Im Folgenden finden Sie eine Schritt-für-Schritt Anleitung dafür, wie Sie zu diesem Repository beitragen können. Diese Anleitung ist detailliert und richtet sich an git-Beginner. Falls Sie bereits erfahrener git-user sind, enthält das [tldr](#tl;dr) eine Kurzanleitung. 
