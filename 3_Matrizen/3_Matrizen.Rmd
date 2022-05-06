@@ -1982,7 +1982,7 @@ print(t(c*A) + B)
 \item Geben Sie die Definition der Matrixmultiplikation wieder.
 \item Es seien $A \in \mathbb{R}^{3 \times 2}, B \in \mathbb{R}^{2\times 4}$
 und $C \in \mathbb{R}^{3 \times 4}$. Prüfen Sie, ob folgende Matrixprodukte
-definiert sind, und wenn ja, geben Sie die Größe der resultierenden Matrix and
+definiert sind, und wenn ja, geben Sie die Größe der resultierenden Matrix an
 \begin{equation}
 ABC, \quad ABC^T, \quad, A^TCB^T \quad, BAC
 \end{equation}
