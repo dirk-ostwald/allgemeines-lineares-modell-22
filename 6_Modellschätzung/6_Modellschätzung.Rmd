@@ -1,0 +1,854 @@
+```{r}
+
+```
+
+---
+fontsize: 8pt
+bibliography: 6_Referenzen.bib
+citation_package: natbib
+output:
+  beamer_presentation:
+    keep_tex: true
+    includes:
+      in_header: 6_header.tex
+---
+
+```{r, include = F}
+source("6_R_common.R")
+fdir        = file.path(getwd(), "6_Abbildungen")                               # Abbildungsverzeichnis
+```
+
+#  {.plain}
+
+\center
+
+```{r, echo = FALSE, out.width = "20%"}
+knitr::include_graphics("6_Abbildungen/alm_6_otto.png")
+```
+
+\vspace{2mm}
+
+\huge
+
+Allgemeines Lineares Modell \vspace{6mm}
+
+\large
+
+BSc Psychologie SoSe 2022
+
+```{=tex}
+\vspace{6mm}
+\normalsize
+```
+Prof. Dr. Dirk Ostwald
+
+#  {.plain}
+
+```{=tex}
+\center
+\huge
+\vfill
+```
+\noindent (6) Modellschätzung \vfill
+
+# Überblick
+
+\large
+
+Naturwissenschaft \vspace{7mm}
+
+```{r, echo = FALSE, out.width = "90%"}
+knitr::include_graphics("6_Abbildungen/alm_6_wissenschaft.pdf")
+```
+
+# Überblick
+
+```{=tex}
+\vspace{1mm}
+\normalsize
+```
+Modellformulierung \vspace{1mm} \small \begin{equation}
+y = X\beta + \varepsilon, \varepsilon \sim N(0_n,\sigma^2I_n)
+\end{equation} \vspace{5mm}
+
+\normalsize
+
+Modellschätzung \small \begin{equation}
+\hat{\beta} = (X^TX)^{-1} X^Ty,  \hat{\sigma}^2 = \frac{(y - X\hat{\beta})^T(y - X\hat{\beta})}{n-p}
+\end{equation} \vspace{4mm}
+
+\normalsize
+
+Modellevaluation \small \begin{equation}
+T = \frac{c^T\hat{\beta} - c^T\beta_0}{\sqrt{\hat{\sigma}^2(X^TX)^{-1}c}}, 
+F = \frac{(\hat{\varepsilon}_1^T\hat{\varepsilon}_1 - \hat{\varepsilon}^T\hat{\varepsilon})/p_2}{\hat{\varepsilon}^T\hat{\varepsilon}/(n-p)}
+\end{equation}
+
+# Überblick
+
+Standardprobleme Frequentistischer Inferenz \small
+
+\noindent (1) Parameterschätzung
+
+Ziel der Parameterschätzung ist es, einen möglichst guten Tipp für die wahren, aber unbekannten, Parameterwerte (oder eine Funktion derer) abzugeben, typischerweise basierend auf der Beobachtung einer Datenrealisierung. \vspace{2mm}
+
+\noindent (2) Konfidenzintervalle
+
+Das Ziel der Bestimmung von Konfidenzintervallen ist es, basierend auf der Verteilung möglicher Parameterschätzwerte eine quantitative Aussage über die mit dem Schätzwert assoziierte Unsicherheit zu treffen. \vspace{2mm}
+
+\noindent (3) Hypothesentests
+
+Das Ziel der Auswertung von Hypothesentests ist es, basierend auf der angenommenen Verteilung der Daten in einer möglichst sinnvollen Form zu entscheiden, ob ein wahrer, aber unbekannter Parameterwert, sich in einer von zwei sich gegenseitig ausschließenden Untermengen des Parameterraumes, welche man als Hypothesen bezeichnet, liegt.
+
+# Überblick
+
+```{r, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("6_Abbildungen/alm_6_frequentistische_inferenz.pdf")
+```
+
+# Überblick
+
+\small
+
+Standardannahmen frequentistischer Inferenz
+
+```{=tex}
+\footnotesize
+\setstretch{1.2}
+```
+Gegeben sei ein statistisches Modell mit. Es wird angenommen, dass ein vorliegender Datensatz eine der möglichen Realisierungen der Daten des Modells ist. Aus frequentistischer Sicht kann man unendlich oft Datensätze basierend auf einem Modell generieren und zu jedem Datensatz Schätzer oder Statistiken auswerten, z.B. den Betaparameterschätzer \vspace{1mm}
+
+```{=tex}
+\begin{itemize}
+\item[] Datensatz (1) : $y^{(1)} = \left(y_1^{(1)}, y_2^{(1)}, ...,y_n^{(1)}\right)^T$  mit $\hat{\beta}^{(1)} = (X^TX)^{-1}X^Ty^{(1)}$
+\item[] Datensatz (2) : $y^{(2)} = \left(y_1^{(2)}, y_2^{(2)}, ...,y_n^{(2)}\right)^T$  mit $\hat{\beta}^{(2)} = (X^TX)^{-1}X^Ty^{(2)}$
+\item[] Datensatz (3) : $y^{(3)} = \left(y_1^{(3)}, y_2^{(3)}, ...,y_n^{(3)}\right)^T$  mit $\hat{\beta}^{(3)} = (X^TX)^{-1}X^Ty^{(3)}$
+\item[] Datensatz (4) : $y^{(4)} = \left(y_1^{(4)}, y_2^{(4)}, ...,y_n^{(4)}\right)^T$  mit $\hat{\beta}^{(4)} = (X^TX)^{-1}X^Ty^{(4)}$
+\item[] Datensatz (5) : $y^{(5)} = ...$
+\end{itemize}
+```
+\vspace{1mm}
+
+Um die Qualität statistischer Methoden zu beurteilen betrachtet die frequentistische Statistik die Wahrscheinlichkeitsverteilungen von Schätzern und Statistiken unter Annahme der Datenverteilung. Was zum Beispiel ist die Verteilung von $\hat{\beta}^{(1)}$, $\hat{\beta}^{(2)}$, $\hat{\beta}^{(3)}$, $\hat{\beta}^{(4)}$, ... also die Verteilung der Zufallsvariable $\hat{\beta} := (X^TX)^{-1}X^Ty$? Wenn eine statistische Methode im Sinne der frequentitischen Standardannahmen "gut" ist, dann heißt das also, dass sie bei häufiger Anwendung "im Mittel gut" ist. Im Einzelfall, also im Normalfall nur eines vorliegenden Datensatzes, kann sie auch "schlecht" sein.
+
+# 
+
+```{=tex}
+\large
+\setstretch{3}
+\vfill
+```
+Allgemeine Theorie
+
+Unabhängige und identisch normalverteilte Zufallsvariablen
+
+Einfache lineare Regression
+
+Selbstkontrollfragen \vfill
+
+# 
+
+```{=tex}
+\large
+\setstretch{3}
+\vfill
+```
+**Allgemeine Theorie**
+
+Unabhängige und identisch normalverteilte Zufallsvariablen
+
+Einfache lineare Regression
+
+Selbstkontrollfragen
+
+\vfill
+
+# Allgemeine Theorie
+
+```{=tex}
+\footnotesize
+\begin{theorem}[Betaparameterschätzer]
+\justifying
+\normalfont
+Es sei
+\begin{equation}
+y = X\beta + \varepsilon \mbox{ mit } \varepsilon \sim N(0_n,\sigma^2I_n)
+\end{equation}
+das ALM in generativer Form und es sei
+\begin{equation}
+\hat{\beta} := (X^TX)^{-1}X^Ty.
+\end{equation}
+der \textit{Betaparameterschätzer}. Dann gilt für festes $y \in \mathbb{R}^n$, dass
+\begin{equation}
+\hat{\beta} = \argmin_{\tilde{\beta}} (y - X\tilde{\beta})^T(y - X\tilde{\beta})
+\end{equation}
+und dass $\hat{\beta}$ ein unverzerrter Maximum Likelihood Schätzer von $\beta \in \mathbb{R}^p$ ist.
+\end{theorem}
+```
+Bemerkungen
+
+-   Das Theorem gibt ein Formel an, um $\beta$ anhand von Designmatrix und Daten zu schätzen.
+-   Als ML Schätzer ist $\hat{\beta}$ konsistent, asymptotisch normalverteilt und asymptotisch effizient.
+-   Wir sehen später, dass $\hat{\beta}$ sogar normalverteilt ist.
+-   Außerdem hat $\hat{\beta}$ die "kleinste Varianz" in der Klasse der linearen unverzerrten Schätzer von $\beta$.
+-   Letztere Eigenschaft ist Kernaussage des \textit{Gauss-Markov Theorems}, auf das wir hier nicht näher eingehen wollen.
+-   Für eine Diskussion und einen Beweis des Gauss-Markov Theorems siehe z.B. @searle_1971, Kapitel 3.
+
+# Allgemeine Theorie
+
+\footnotesize
+
+\underline{Beweis}
+
+\noindent (1) Wir zeigen in einem ersten Schritt, dass $\hat{\beta}$ die Summe der Abweichungsquadrate \begin{equation}
+(y - X\tilde{\beta})^T(y - X\tilde{\beta})
+\end{equation} minimiert. Dazu halten wir zunächst fest, dass \begin{equation}
+\hat{\beta} = (X^TX)^{-1}X^Ty 
+\Leftrightarrow 
+X^TX\hat{\beta} = X^Ty
+\Leftrightarrow 
+X^Ty - X^TX\hat{\beta} = 0_p
+\Leftrightarrow 
+X^T(y -  X\hat{\beta}) = 0_p.
+\end{equation} Weiterhin gilt dann auch, dass \begin{equation}
+X^T(y - X\hat{\beta}) = 0_p
+\Leftrightarrow
+\left(X^T(y - X\hat{\beta})\right)^T = 0_p^T
+\Leftrightarrow
+(y - X\hat{\beta})^TX = 0_p^T
+\end{equation} Weiterhin halten wir ohne Beweis fest, dass für jede Matrix $X \in \mathbb{R}^{n \times p}$ gilt, dass \begin{equation}
+z^TX^TXz \ge 0 \mbox{ für alle } z \in \mathbb{R}^p.
+\end{equation} Wir betrachten nun für festes $y$ und ein beliebiges $\tilde{\beta}$ die Summe der Abweichungsquadrate \begin{equation}
+(y - X\tilde{\beta})^T(y - X\tilde{\beta}).
+\end{equation}
+
+# Allgemeine Theorie
+
+\footnotesize
+
+\underline{Beweis (fortgeführt)}
+
+Es ergibt sich \begin{align}
+\begin{split}
+(y - X\tilde{\beta})^T(y - X\tilde{\beta})
+& = (y - X\hat{\beta} + X\hat{\beta} - X\tilde{\beta})^T(y - X\hat{\beta} + X\hat{\beta} - X\tilde{\beta}) \\
+& = ((y - X\hat{\beta}) + X(\hat{\beta} -\tilde{\beta}))^T((y - X\hat{\beta}) + X(\hat{\beta} -\tilde{\beta})) \\
+& = \quad\quad
+     (y - X\hat{\beta})^T(y - X\hat{\beta})
+   + (y - X\hat{\beta})^T X(\hat{\beta} -\tilde{\beta}) \\
+&  \quad\quad
+   + (\hat{\beta} -\tilde{\beta})^TX^T(y - X\hat{\beta})
+   + (\hat{\beta} -\tilde{\beta})^TX^TX(\hat{\beta} -\tilde{\beta}) \\
+& = \quad\quad
+     (y - X\hat{\beta})^T(y - X\hat{\beta})
+   +  0_p^T(\hat{\beta} -\tilde{\beta}) \\
+&  \quad\quad
+   + (\hat{\beta} -\tilde{\beta})^T0_p
+   + (\hat{\beta} -\tilde{\beta})^TX^TX(\hat{\beta} -\tilde{\beta}) \\
+& = (y - X\hat{\beta})^T(y - X\hat{\beta}) + (\hat{\beta} -\tilde{\beta})^TX^TX(\hat{\beta} -\tilde{\beta}) \\
+\end{split}
+\end{align} Auf der rechten Seite obiger Gleichung ist nur der zweite Term von $\tilde{\beta}$ abhängig. Da für diesen Term weiterhin gilt, dass \begin{equation}
+(\hat{\beta} -\tilde{\beta})^TX^TX(\hat{\beta} -\tilde{\beta}) \ge 0
+\end{equation} nimmt dieser Term genau dann seinen Minimalwert 0 an, wenn \begin{equation}
+(\hat{\beta} -\tilde{\beta}) = 0_p \Leftrightarrow \tilde{\beta} = \hat{\beta}.
+\end{equation} Also gilt \begin{equation}
+\hat{\beta} = \argmin_{\tilde{\beta}} (y - X\tilde{\beta})^T(y - X\tilde{\beta}).
+\end{equation}
+
+# Allgemeine Theorie
+
+\footnotesize
+
+\underline{Beweis (fortgeführt)}
+
+\noindent (2) Um zu zeigen, dass $\hat{\beta}$ ein Maximum Likelihood Schätzer ist, betrachten wir für festes $y \in \mathbb{R}^n$ und festes $\sigma^2 > 0$ die Log-Likelihood Funktion \begin{equation}
+\ell : \mathbb{R}^p \to \mathbb{R}_{>0}, \tilde{\beta} \mapsto \ln p_{\tilde{\beta}}(y) = \ln N(y;X\tilde{\beta}, \sigma^2I_n)
+\end{equation} wobei gilt, dass \begin{align}
+\begin{split}
+\ln N(y;X\tilde{\beta}, \sigma^2I_n)
+& = \ln\left((2\pi)^{-\frac{n}{2}}|\sigma^2I_n|^{-\frac{1}{2}}\exp\left(-\frac{1}{2\sigma^2}(y - X\tilde{\beta})^T(y - X\tilde{\beta})\right)\right) \\
+& = -\frac{n}{2} \ln 2\pi - \frac{1}{2} \ln |\sigma^2I_n| - \frac{1}{2\sigma^2}(y - X\tilde{\beta})^T(y - X\tilde{\beta})
+\end{split}
+\end{align} Dabei hängt allein der Term \begin{equation}
+- \frac{1}{2\sigma^2}(y - X\tilde{\beta})^T(y - X\tilde{\beta})
+\end{equation} von $\tilde{\beta}$ ab und wird aufgrund des Vorzeichens maximal, wenn der Term \begin{equation}
+(y - X\tilde{\beta})^T(y - X\tilde{\beta})
+\end{equation} minimal wird. Dies ist aber wie oben gezeigt genau für \begin{equation}
+\tilde{\beta} = \hat{\beta}
+\end{equation} der Fall.
+
+# Allgemeine Theorie
+
+\footnotesize
+
+\underline{Beweis (fortgeführt)}
+
+\noindent (3) Die Unverzerrtheit von $\hat{\beta}$ schließlich ergibt sich aus \begin{align}
+\begin{split}
+\mathbb{E}(\hat{\beta}) 
+= \mathbb{E}\left((X^TX)^{-1}X^Ty\right) 
+= (X^TX)^{-1}X^T\mathbb{E}(y) 
+= (X^TX)^{-1}X^TX\beta 
+= \beta.
+\end{split}
+\end{align}
+
+# Allgemeine Theorie
+
+```{=tex}
+\small
+\begin{theorem}[Varianzparameterschätzer]
+\justifying
+\normalfont
+Es sei 
+\begin{equation}
+y = X\beta + \varepsilon \mbox{ mit } \varepsilon \sim N(0_n,\sigma^2I_n)
+\end{equation}
+das ALM in generativer Form. Dann ist
+\begin{equation}
+\hat{\sigma}^2 := \frac{(y - X\hat{\beta})^T(y - X\hat{\beta})}{n - p}
+\end{equation}
+ein unverzerrter Schätzer von $\sigma^2 > 0$.
+\end{theorem}
+```
+\footnotesize
+
+Bemerkungen
+
+-   Es handelt sich bei $\hat{\sigma}^2$ \textit{nicht} um einen ML Schätzer von $\sigma^2$.
+-   Für einen Beweis siehe z.B. @searle_1971, Kapitel 3 oder @rencher_2008, Kapitel 7.
+
+# 
+
+```{=tex}
+\large
+\setstretch{3}
+\vfill
+```
+Allgemeine Theorie
+
+**Unabhängige und identisch normalverteilte Zufallsvariablen**
+
+Einfache lineare Regression
+
+Selbstkontrollfragen \vfill
+
+# Unabhängige und identisch normalverteilte Zufallsvariablen
+
+\footnotesize
+
+Wir betrachten das Szenario von $n$ Unabhängige und identisch normalverteilte Zufallsvariablen mit Erwartungswertparameter $\mu \in \mathbb{R}$ und Varianzparameter $\sigma^2$, \begin{equation}
+y_i \sim N(\mu,\sigma^2) \mbox{ für } i = 1,...,n.
+\end{equation} Dann gilt, wie unten gezeigt, \begin{equation}\label{eq:iid_estimators}
+\hat{\beta} = \frac{1}{n}\sum_{i=1}^n y_i =: \bar{y}
+\mbox{ und }
+\hat{\sigma}^2 = \frac{1}{n-1}\sum_{i=1}^n (y_i - \bar{y})^2 =: s^2_y.
+\end{equation} In diesem Fall ist also der Betaparameterschätzer mit dem Stichprobenmittel $\bar{y}$ der $y_1,...,y_n$ und der Varianzparameterschätzer mit der Stichprobenvarianz der $y_1,...,y_n$ identisch.
+
+# Unabhängige und identisch normalverteilte Zufallsvariablen
+
+\footnotesize
+
+Für $\hat{\beta}$ ergibt sich \begin{align*}
+\begin{split}
+\hat{\beta}
+& = (X^TX)^{-1}X^T y
+\\
+& =
+\left(
+\begin{pmatrix}
+1 & \cdots & 1\\
+\end{pmatrix}
+\begin{pmatrix}
+1\\
+\vdots \\
+1\\
+\end{pmatrix}
+\right)^{-1}
+\begin{pmatrix}
+1 & \cdots & 1\\
+\end{pmatrix}
+\begin{pmatrix}
+y_{1}\\
+\vdots \\
+y_{n}\\
+\end{pmatrix}
+\\
+& = n^{-1}\sum_{i=1}^n y_i
+\\
+& =\frac{1}{n}\sum_{i=1}^n y_i
+\\
+& =: \bar{y}.
+\end{split}
+\end{align*}
+
+# Unabhängige und identisch normalverteilte Zufallsvariablen
+
+\footnotesize
+
+Für $\hat{\sigma}^2$ ergibt sich \begin{align*}
+\begin{split}
+\hat{\sigma}^2
+& = \frac{1}{n-1}\left(y-X\hat{\beta}\right)^T\left(y-X\hat{\beta} \right)
+\\
+& = \frac{1}{n-1}
+\left(
+\begin{pmatrix} y_1 \\  \vdots  \\  y_n \\  \end{pmatrix} -
+\begin{pmatrix} 1       \\  \vdots  \\  1     \\    \end{pmatrix}
+\left(\frac{1}{n}\sum_{i=1}^n y_i \right)
+\right)^T
+\left(
+\begin{pmatrix} y_1 \\  \vdots  \\  y_n \\  \end{pmatrix} -
+\begin{pmatrix} 1       \\  \vdots  \\  1     \\    \end{pmatrix}
+\left(\frac{1}{n}\sum_{i=1}^n y_i \right)
+\right)
+\\
+& =
+\frac{1}{n-1}
+\begin{pmatrix}
+y_{1}-\frac{1}{n}\sum_{i=1}^n y_i \\
+\vdots \\
+y_{n}-\frac{1}{n}\sum_{i=1}^n y_i \\
+\end{pmatrix}^T
+\begin{pmatrix}
+y_{1}-\frac{1}{n}\sum_{i=1}^n y_i \\
+\vdots \\
+y_{n}-\frac{1}{n}\sum_{i=1}^n y_i \\
+\end{pmatrix}
+\\
+& = \frac{1}{n-1} \sum_{i=1}^n \left(y_i-\frac{1}{n} \sum_{i=1}^n y_i \right)^2
+\\
+& = \frac{1}{n-1}\sum_{i=1}^n \left(y_i-\bar{y} \right)^2
+\\
+& =: s^2_y.
+\end{split}
+\end{align*}
+
+# Unabhängige und identisch normalverteilte Zufallsvariablen
+
+```{=tex}
+\setstretch{1}
+\footnotesize
+```
+```{r}
+# Libraries
+library(MASS)                                    # Multivariate Normalverteilung 
+
+# Modellformulierung
+n         = 12                                   # Anzahl von Datenpunkten
+p         = 1                                    # Anzahl von Betparametern
+X         = matrix(rep(1,n), nrow = n)           # Designmatrix
+I_n       = diag(n)                              # n x n Einheitsmatrix
+beta      = 2                                    # wahrer, aber unbekannter, Betaparameter
+sigsqr    = 1                                    # wahrer, aber unbekannter, Varianzparameter
+
+# Datenrealisierung
+y        =  mvrnorm(1, X %*% beta, sigsqr*I_n)   # eine Realisierung eines n-dimensionalen ZVs
+
+# Betaparameterschätzung (matlib's inv funktioniert für 1 x 1 Matrizen nicht...)
+beta_hat = solve(t(X) %*% X) %*% t(X) %*% y      # \hat{\beta} = (X^T)X^{-1}X^Ty 
+
+# Ausgabe
+cat("beta     : ", beta,
+    "\nhat{beta}: ", beta_hat)
+
+```
+
+# Unabhängige und identisch normalverteilte Zufallsvariablen
+
+\footnotesize
+
+Simulation der Schätzerunverzerrtheit \vspace{2mm}
+
+```{=tex}
+\setstretch{1}
+\footnotesize
+```
+```{r}
+# Libraries
+library(MASS)                                      # Multivariate Normalverteilung
+
+# Modellformulierung
+n        = 12                                      # Anzahl von Datenpunkten
+p        = 1                                       # Anzahl von Betparametern
+X        = matrix(rep(1,n), nrow = n)              # Designmatrix
+I_n      = diag(n)                                 # n x n Einheitsmatrix
+beta     = 2                                       # wahrer, aber unbekannter, Betaparameter
+sigsqr   = 1                                       # wahrer, aber unbekannter, Varianzparameter
+
+# Frequentistische Simulation
+nsim     = 1e5                                     # Anzahl Realisierungen des n-dimensionalen ZVs
+beta_hat = rep(NaN,nsim)                           # \hat{\beta} Realisierungsarray
+for(i in 1:nsim){
+  y           = mvrnorm(1, X %*% beta, sigsqr*I_n) # eine Realisierung eines n-dimensionalen ZVs
+  beta_hat[i] = solve(t(X) %*% X) %*% t(X) %*% y   # \hat{\beta} = (X^T)X^{-1}X^Ty 
+}
+
+# Ausgabe
+cat("Wahrer, aber unbekannter, Betaparameter               : ", beta,
+    "\nGeschätzter Erwartungswert des Betaparameterschätzers : ", mean(beta_hat))
+```
+
+# 
+
+```{=tex}
+\large
+\setstretch{3}
+\vfill
+```
+Allgemeine Theorie
+
+Unabhängige und identisch normalverteilte Zufallsvariablen
+
+**Einfache lineare Regression**
+
+Selbstkontrollfragen \vfill
+
+# Einfache lineare Regression
+
+\footnotesize
+
+Wir betrachten das generative Modell der einfachen linearen Regression \begin{equation}\label{eq:slr}
+y_i = \beta_0 + \beta_1x_i + \varepsilon_i, \varepsilon_i \sim N(0,\sigma^2) \mbox{ für } i = 1,...,n,
+\end{equation} Dann gilt \begin{equation}\label{eq:slr_estimators}
+\hat{\beta}
+= \begin{pmatrix} \hat{\beta}_0 \\ \hat{\beta}_1 \end{pmatrix}
+= \begin{pmatrix} \bar{y} - \frac{c_{xy}}{s_x^2}\bar{x} \\ \frac{c_{xy}}{s_x^2} \end{pmatrix}
+\mbox{ and }
+\hat{\sigma}^2 = \frac{1}{n-2}\sum_{i=1}^n (y_i - (\hat{\beta}_0 + \hat{\beta}_1x_i))^2
+\end{equation} wobei $\bar{x}$ und $\bar{y}$ die Stichprobenmittel der $x_1,...,x_n$ und $y_1,...,y_n$, respektive, bezeichnen, $c_{xy}$ die Stichprobenkovarianz der $x_1, ...,x_n$ und $s_x^2$ die Stichprobenvarianz der $x_1,...,x_n$ bezeichnen, wie unten gezeigt.
+
+Wir halten fest, dass für eine parametrische Designmatrixspalte sich der entsprechende Betaparameterschätzer aus der Stichprobenkovarianz der respektiven Spalte mit den Daten geteil durch die Stichprobenvarianz der entsprechenden Spalte ergibt und somit einer "standardisierten" Stichhprobenkovarianz entspricht. Wie in (1) Regression sind die Bezeichnungen "Stichproben"kovarianz und "Stichproben"varianz bezüglich der $x_1,...,x_n$ hier lediglich formal gemeint, da keine Annahme zugrundeliegt, dass die $x_1,...,x_n$ Realisierungen von Zufallsvariablen sind. Die $x_1,...,x_n$ sind vorgegebene Werte. Ein Vergleich mit den Parametern der Ausgleichsgerade in (1) Regression zeigt weiterhin die Identität der Betaparameterschätzerkomponenten $\hat{\beta}_0$ und $\hat{\beta}_1$ mit den dort unter dem Kriterium der Minimierung der quadrierten vertikalen Abweichungen hergeleiteten Parametern. Dies überrascht nicht, da sowohl $\hat{\beta}$ als auch die Parameter der Ausgleichsgerade den Wert\
+\begin{equation}
+q(\tilde{\beta}) = \sum_{i=1}^n (y_i - (\tilde{\beta}_0 + \tilde{\beta}_1 x_i)) = (y - X\tilde{\beta})^T(y - X\tilde{\beta})
+\end{equation} hinsichtlich $\tilde{\beta}$ minimieren.
+
+# Einfache lineare Regression
+
+\footnotesize
+
+Um die Form des Betaparameterschätzers herzuleiten, halten wir zunächst fest, dass \tiny \begin{align}
+\begin{split}
+c_{xy}
+:= \sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})
+& = \sum_{i=1}^n (x_iy_i - x_i\bar{y} - \bar{x}y_i + \bar{x}\bar{y}) \\
+& = \sum_{i=1}^n x_iy_i
+  - \sum_{i=1}^n x_i\bar{y}
+  - \sum_{i=1}^n \bar{x}y_i
+  + \sum_{i=1}^n \bar{x}\bar{y} \\
+& = \sum_{i=1}^n x_iy_i
+  - \bar{y} \sum_{i=1}^n x_i
+  - \bar{x}\sum_{i=1}^n y_i
+  + n \bar{x}\bar{y} \\
+& = \sum_{i=1}^n x_iy_i
+  - \bar{y}n\bar{x}
+  - \bar{x}n\bar{y}
+  + n\bar{x}\bar{y} \\
+  & = \sum_{i=1}^n x_iy_i
+  - n\bar{x}\bar{y}
+  - n\bar{x}\bar{y}
+  + n\bar{x}\bar{y} \\
+& = \sum_{i=1}^n x_i y_i  - n \bar{x}\bar{y},
+\end{split}
+\end{align}
+
+# Einfache lineare Regression
+
+\footnotesize
+
+Weiterhin halten wir fest, dass \tiny \begin{align}
+\begin{split}
+s_x^2
+:= \sum_{i=1}^n (x_i - \bar{x})^2
+& = \sum_{i=1}^n (x_i^2 - 2x_i\bar{x}  + \bar{x}^2) \\
+& = \sum_{i=1}^n x_i^2 - \sum_{i=1}^n 2x_i\bar{x}  + \sum_{i=1}^n \bar{x}^2 \\
+& = \sum_{i=1}^n x_i^2 - 2\bar{x}\sum_{i=1}^n x_i  + n\bar{x}^2 \\
+& = \sum_{i=1}^n x_i^2 - 2\bar{x}n\bar{x}  + n\bar{x}^2 \\
+& = \sum_{i=1}^n x_i^2 - 2n\bar{x}^2 + n\bar{x}^2 \\
+& = \sum_{i=1}^n x_i^2 - n\bar{x}^2.\\
+\end{split}
+\end{align}
+
+# Einfache lineare Regression
+
+\footnotesize
+
+Aus der Definition von $\hat{\beta}$ ergibt sich \begin{align}
+\begin{split}
+\hat{\beta}
+& = (X^T X)^{-1}X^Ty \\
+& =
+\left(
+\begin{pmatrix}
+1   & \cdots & 1 \\
+x_1 & \cdots & x_n
+\end{pmatrix}
+\begin{pmatrix}
+1       & x_1       \\
+\vdots  & \vdots    \\
+1       & x_n
+\end{pmatrix}
+\right)^{-1}
+\begin{pmatrix}
+1   & \cdots & 1 \\
+x_1 & \cdots & x_n
+\end{pmatrix}
+\begin{pmatrix}
+y_1     \\
+\vdots  \\
+y_n
+\end{pmatrix} \\
+& =
+\begin{pmatrix}
+n                   & \sum_{i=1}^n x_i \\
+\sum_{i=1}^n x_i    & \sum_{i=1}^n x_i^2\\
+\end{pmatrix}^{-1}
+\begin{pmatrix}
+\sum_{i=1}^n y_i    \\
+\sum_{i=1}^n x_i y_i    \\
+\end{pmatrix}
+\\
+& =
+\begin{pmatrix}
+n           &  n\bar{x} \\
+n\bar{x}    & \sum_{i=1}^n x_i^2\\
+\end{pmatrix}^{-1}
+\begin{pmatrix}
+n\bar{y}    \\
+\sum_{i=1}^n x_i y_i    \\
+\end{pmatrix}.
+\end{split}
+\end{align}
+
+Die Inverse von $X^T X$ ist gegeben durch \begin{equation}
+\frac{1}{s_x^2}
+\begin{pmatrix}
+  \frac{s_x^2}{n} + \bar{x}^2
+& -\bar{x}
+\\
+  -\bar{x}
+&  1
+\end{pmatrix},
+\end{equation}
+
+# Einfache lineare Regression
+
+\footnotesize
+
+weil \begin{align}
+\begin{split}
+& \frac{1}{s_x^2}
+\begin{pmatrix}
+  \frac{s_x^2}{n} + \bar{x}^2
+& -\bar{x}
+\\
+  -\bar{x}
+&  1
+\end{pmatrix}
+\begin{pmatrix}
+n           &  n\bar{x} \\
+n\bar{x}    & \sum_{i=1}^n x_i^2\\
+\end{pmatrix}
+\\
+& =
+\frac{1}{s_x^2}
+\begin{pmatrix}
+\frac{ns_x^2}{n} + n\bar{x}^2 - n \bar{x}^2
+& \frac{s_x^2n\bar{x}}{n} +n\bar{x}^2\bar{x} - \bar{x}\sum_{i=1}^n x_i^2
+\\
+-\bar{x}n + n \bar{x}
+& - n\bar{x}^2 + \sum_{i=1}^n x_i^2
+\end{pmatrix} \\
+& =
+\frac{1}{s_x^2}
+\begin{pmatrix}
+s_x^2
+& s_x^2\bar{x} -\bar{x} \left(\sum_{i=1}^n x_i^2 - n\bar{x}^2\right)
+\\
+0
+& \sum_{i=1}^n x_i^2 - n\bar{x}^2
+\end{pmatrix}
+\\
+& =
+\frac{1}{s_x^2}
+\begin{pmatrix}
+s_x^2
+& s_x^2\bar{x} - \bar{x} s_x^2
+\\
+0
+& s_x^2
+\end{pmatrix}
+\\
+& =
+\frac{1}{s_x^2}
+\begin{pmatrix}
+s_x^2
+& 0
+\\
+0
+& s_x^2
+\end{pmatrix}
+\\
+& =
+\begin{pmatrix}
+1 & 0 \\ 0 & 1
+\end{pmatrix}.
+\end{split}
+\end{align}
+
+# Einfache lineare Regression
+
+\footnotesize
+
+Es ergibt sich also \begin{align}
+\renewcommand{\arraystretch}{1.2}
+\begin{split}
+\hat{\beta}
+= \begin{pmatrix}
+  \frac{1}{n} + \frac{\bar{x}^2}{s_x^2}
+& -\frac{\bar{x}}{s_x^2}
+\\
+  -\frac{\bar{x}}{s_x^2}
+&  \frac{1}{s_x^2}
+\end{pmatrix}
+\begin{pmatrix}
+n\bar{y}    \\
+\sum_{i=1}^n x_i y_i    \\
+\end{pmatrix}
+& = \begin{pmatrix}
+\left(\frac{1}{n} + \frac{\bar{x}^2}{s_x^2}\right)n\bar{y} - \frac{\bar{x}\sum_{i=1}^n x_iy_i}{s_x^2}   \\
+\frac{\sum_{i=1}^n x_i y_i }{s_x^2} - \frac{n\bar{x}\bar{y}}{s_x^2} \\
+\end{pmatrix}
+\\
+&
+=
+\begin{pmatrix}
+\frac{n\bar{y}}{n} + \frac{\bar{x}^2n\bar{y}}{s_x^2}- \frac{\bar{x}\sum_{i=1}^n x_iy_i}{s_x^2}
+\\
+\frac{\sum_{i=1}^n x_i y_i - n\bar{x}\bar{y}}{s_x^2}    \\
+\end{pmatrix}
+\\
+& =
+\begin{pmatrix}
+\bar{y} + \frac{\bar{x}n\bar{x}\bar{y} - \bar{x}\sum_{i=1}^n x_iy_i}{s_x^2}
+\\
+\frac{\sum_{i=1}^n x_i y_i - n\bar{x}\bar{y}}{s_x^2}    \\
+\end{pmatrix}
+\\
+& =
+\begin{pmatrix}
+\bar{y} - \frac{\sum_{i=1}^n x_iy_i - n\bar{x}\bar{y}}{s_x^2}\bar{x}
+\\
+\frac{\sum_{i=1}^n x_i y_i - n\bar{x}\bar{y}}{s_x^2}
+\end{pmatrix}
+\\
+& =
+\begin{pmatrix}
+\bar{y} - \frac{c_{xy}}{s_x^2}\bar{x}
+\\
+\frac{c_{xy}}{s_x^2}
+\end{pmatrix}.
+\end{split}
+\end{align}
+
+# Einfache lineare Regression
+
+```{=tex}
+\setstretch{1}
+\footnotesize
+```
+```{r}
+# Libraries
+library(MASS)                                  # Multivariate Normalverteilung 
+library(matlib)                                # Matrizenrechnung
+
+# Modellformulierung
+n        = 10                                  # Anzahl von Datenpunkten
+p        = 2                                   # Anzahl von Betaparametern
+x        = 1:n                                 # Prädiktorwerte
+X        = matrix(c(rep(1,n),x), nrow = n)     # Designmatrix
+I_n      = diag(n)                             # n x n Einheitsmatrix
+beta     = matrix(c(0,1), nrow = p)            # wahrer, aber unbekannter, Betaparameter
+sigsqr   = 1                                   # wahrer, aber unbekannter, Varianzparameter
+
+# Datenrealisierung
+y        = mvrnorm(1, X %*% beta, sigsqr*I_n)  # eine Realisierung eines n-dimensionalen ZVs
+beta_hat = inv(t(X) %*% X) %*% t(X) %*% y      # \hat{\beta} = (X^TX)^{-1}X^Ty
+
+# Ausgabe
+cat("beta     : "  , beta,
+    "\nhat{beta}: ", beta_hat)
+
+```
+
+# Unabhängige und identisch normalverteilte Zufallsvariablen
+
+\footnotesize
+
+Simulation der Schätzerunverzerrtheit \vspace{2mm}
+
+```{=tex}
+\setstretch{1}
+\footnotesize
+```
+```{r}
+# Libraries
+library(MASS)                                       # Multivariate Normalverteilung 
+library(matlib)                                     # Matrizenrechnung
+
+# Modellformulierung
+n        = 10                                       # Anzahl von Datenpunkten
+p        = 2                                        # Anzahl von Betparametern
+x        = 1:n                                      # Prädiktorwerte
+X        = matrix(c(rep(1,n),x), nrow = n)          # Designmatrix
+I_n      = diag(n)                                  # n x n Einheitsmatrix
+beta     = matrix(c(0,1), nrow = p)                 # wahrer, aber unbekannter, Betaparameter
+sigsqr   = 1                                        # wahrer, aber unbekannter, Varianzparameter
+
+# Frequentistische Simulation
+nsim     = 1e4                                      # Anzahl Realisierungen des n-dimensionalen ZVs
+beta_hat = matrix(rep(NaN,p*nsim), nrow = p)        # \hat{\beta} Realisierungsarray
+for(i in 1:nsim){
+  y            = mvrnorm(1, X %*% beta, sigsqr*I_n) # eine Realisierung eines n-dimensionalen ZVs
+  beta_hat[,i] = inv(t(X) %*% X) %*% t(X) %*% y     # \hat{\beta} = (X^T)X^{-1}X^Ty 
+}
+
+# Ausgabe
+cat("Wahrer, aber unbekannter, Betaparameter               : ", beta,
+    "\nGeschätzter Erwartungswert des Betaparameterschätzers : ", rowMeans(beta_hat))
+```
+
+# 
+
+```{=tex}
+\large
+\setstretch{3}
+\vfill
+```
+Allgemeine Theorie
+
+Unabhängige und identisch normalverteilte Zufallsvariablen
+
+Einfache lineare Regression
+
+**Selbstkontrollfragen**
+
+\vfill
+
+# Selbstkontrollfragen
+
+```{=tex}
+\footnotesize
+\setstretch{2}
+```
+1.  Geben Sie das Betaparameterschätzer Theorem wieder.
+2.  Geben Sie das Varianzparameterschätzer Theorem wieder.
+3.  Geben Sie die Beta- und Varianzparameterschätzer des ALM Szenarios von $n$ unabhängigen und identisch normalverteilten Zufallsvariablen wieder.
+4.  Geben Sie die Beta- und Varianzparameterschätzer des ALM Szenarios der einfachen linearen Regression wieder.
+5.  Wie unterscheiden sich die Betaparameterschätzer des ALM Szenarios der einfachen linearen Regression und die Parameter der Ausgleichsgerade aus Einheit (1) Regression?
+6.  Simulieren Sie die Unverzerrtheit des Varianzparameterschätzers im ALM Szenario von $n$ unabhängigen und identisch normalverteilten Zufallsvariablen in einem R Skript.
+7.  Simulieren Sie die Unverzerrtheit des Varianzparameterschätzers im ALM Szenario der einfachen linearen Regression in einem R Skript.
+
+# References
+
+\footnotesize
