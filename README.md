@@ -1,9 +1,8 @@
 # Allgemeines lineares Modell (SoSe 2022)
 
 
-## Inhaltsverzeichnis
+## Inhaltsverzeichnis <!-- omit in toc -->
 - [Allgemeines lineares Modell (SoSe 2022)](#allgemeines-lineares-modell-sose-2022)
-  - [Inhaltsverzeichnis](#inhaltsverzeichnis)
   - [Allgemeine Informationen](#allgemeine-informationen)
   - [Anleitung, wie man beitragen kann](#anleitung-wie-man-beitragen-kann)
     - [Schritt 1: Repository kopieren (***Fork***)](#schritt-1-repository-kopieren-fork)
