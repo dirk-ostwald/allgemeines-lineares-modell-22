@@ -1,0 +1,2382 @@
+---
+fontsize: 8pt
+bibliography: 11_Referenzen.bib
+citation_package: natbib
+output:
+  beamer_presentation:
+    keep_tex: true
+    includes:
+      in_header: 11_header.tex
+---
+
+
+```{r, include = F}
+source("11_R_common.R")
+fdir        = file.path(getwd(), "11_Abbildungen")                                # Abbildungsverzeichnis
+```
+
+
+#  {.plain}
+\center
+```{r, echo = FALSE, out.width = "20%"}
+knitr::include_graphics("11_Abbildungen/alm_11_otto.png")
+```
+
+\vspace{2mm}
+
+\huge
+Allgemeines Lineares Modell
+\vspace{6mm}
+
+\large
+BSc Psychologie SoSe 2022
+
+\vspace{6mm}
+\normalsize
+Prof. Dr. Dirk Ostwald
+
+#
+\small
+\center
+\footnotesize
+\begin{tabular}{lll}
+Datum        & Einheit                       & Thema					                \\\hline
+08.04.2022   & Grundlagen                    & (1) Regression  				            \\
+             & \textcolor{gray}{Osterpause}                                             \\
+22.04.2022   & Grundlagen                    & (2) Korrelation               	        \\
+29.04.2022   & Grundlagen                    & (3) Matrizen                             \\
+06.05.2022   & Grundlagen                    & (4) Normalverteilungen                   \\
+13.05.2022   & Theorie                       & (5) Modellformulierung                   \\
+20.05.2022   & Theorie                       & (6) Modellschätzung                      \\
+27.05.2022   & Theorie                       & (7) Modellevaluation                     \\
+03.06.2021   & Anwendung                     & (8) Studiendesign                        \\
+10.06.2021   & Anwendung                     & (9) T-Tests                              \\
+17.06.2021   & Anwendung                     & (10) Einfaktorielle Varianzanalyse       \\
+24.06.2022   & Anwendung                     & (11) Zweifaktorielle Varianzanalyse      \\
+01.07.2022   & Anwendung                     & (12) Multiple Regression (9 - 12 Uhr)    \\
+01.07.2022   & Anwendung                     & (13) Kovarianzanalyse (13 - 15 Uhr)      \\\hline
+14.07.2022   & Klausurtermin                 &                                          \\
+März 2023    & Klausurwiederholungstermin    &
+\end{tabular}
+
+
+# {.plain}
+\center
+\huge
+\vfill
+\noindent (11) Zweifaktorielle Varianzanalyse
+\vfill
+
+#
+\large
+\setstretch{2.7}
+\vfill
+Anwendungsszenario
+
+Modellformulierung
+
+Modellschätzung
+
+Modellevaluation
+
+Selbstkontrollfragen
+\vfill
+
+#
+\large
+\setstretch{2.7}
+\vfill
+**Anwendungsszenario**
+
+Modellformulierung
+
+Modellschätzung
+
+Modellevaluation
+
+Selbstkontrollfragen
+\vfill
+
+
+# Anwendungsszenario
+\setstretch{1.5}
+\textcolor{darkblue}{Randomisiertes zweifaktorielles Studiendesigns mit crossed design}
+
+\flushright
+\textcolor{darkblue}{$\Rightarrow$ Zweifaktorielle Varianzanalyse (ZVA) = Two-way Analysis of Variance (ANOVA)}
+
+\flushleft
+\small
+* Eine univariate abhängige Variable bestimmt an randomisierten experimentellen Einheiten.
+* Zwei diskrete unabhängige Variablen, die mindestens zweistufig sind.
+* Die unabhängigen Variablen werden **Faktoren** genannt.
+* Die Stufen der Faktoren werden auch **Faktorlevel** genannt.
+* Jedes Level eines Faktors wird mit allen Level des anderen Faktors kombiniert.
+* Die Kombination zweier spezifischer Faktorlevel wird **Zelle** des Designs genannt.
+
+Zweifaktorielle Studiendesigns werden üblicherweise anhand ihrer Faktorlevel bezeichnet
+
+\small
+\center
+\begin{tabular}{lll}
+2 x 2 ANOVA : Faktor A mit Level 1,2     & Faktor B mit Level 1,2       \\
+2 x 3 ANOVA : Faktor A mit Level 1,2     & Faktor B mit Level 1,2,3     \\
+4 x 2 ANOVA : Faktor A mit Level 1,2,3,4 & Faktor B mit Level 1,2       \\
+3 x 1 ANOVA : Faktor A mit Level 1,2,3   & Faktor B mit Level 1
+\end{tabular}
+
+\flushleft
+Generell sind 2 x 2 Designs sehr populär, wir fokussieren auf diesen Fall.
+
+Die Zellen eines 2 x 2 Designs werden im Folgenden auch als Gruppen bezeichnet.
+
+# Anwendungsszenario
+\textcolor{darkblue}{Konzeptuelles Design}
+
+\center
+```{r, echo = FALSE, out.width = "65%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_konzept.pdf")
+```
+
+\center
+\small
+Die Zellen/Gruppen des Designs sind hier mit A1B1, A1B2, A2B1 und A2B2 bezeichnet.
+
+
+# Anwendungsszenario
+\vspace{2mm}
+\textcolor{darkblue}{Datennotation}
+
+```{r, echo = FALSE, out.width = "70%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_datennotation.pdf")
+```
+
+\center
+\small
+$y_{ijk}$ bezeichnet die Datenvariable der $k$ten experimentellen Einheit ($k = 1,...,n_{ij}$)
+im $i$ten Level von Faktor A und $j$ten Level von Faktor B ($i = 1,2, j = 1,2$)
+
+# Anwendungsszenario
+\textcolor{darkblue}{Datentabellenform mit $n_{ij} := 12, 1 \le i,j \le 2$}
+
+\small
+\center
+
+```{r, echo = F}
+
+# Modellformulierung
+set.seed(1)                                               # reproducible data
+m       = 12                                              # Stichprobengrößen
+mu      = c(3,5,3.5,7)                                    # Erwartungswertparameter
+sigsqr  = 1                                               # Varianzparameter
+pq      = 4                                               # Anzahl von Stichproben
+n       = pq*m                                            # Gesamtstichprobengröße
+Y       = data.frame(                                     # Dataframeinitialisierung
+          A1B1   = rep(NaN,m),
+          A1B2   = rep(NaN,m),
+          A2B1   = rep(NaN,m),
+          A2B2   = rep(NaN,m))
+
+# Modellsampling
+for(i in 1:pq){                                            # Stichprobeniterationen
+    for(j in 1:m){                                        # Experimentelle Einheiten Iterationen
+        Y[j,i] = rnorm(1,mu[i], sqrt(sigsqr))             # X_ij \sim N(\mu_i,\sigma^2)
+    }
+}
+
+```
+
+```{r, echo = F}
+ knitr::kable(Y, row.names = TRUE, col.names = c("$y_{11k}$", "$y_{12k}$", "$y_{21k}$", "$y_{22k}$"),  "pipe")
+```
+\vspace{-2mm}
+\center
+\small
+$y_{ijk}$ bezeichnet die Datenvariable der $k$ten experimentellen Einheit ($k = 1,...,n_{ij}$)
+im $i$ten Level von Faktor A und $j$ten Level von Faktor B ($i = 1,2, j = 1,2$)
+
+# Anwendungsszenario
+\textcolor{darkblue}{Datendeskription durch Boxplot}
+
+```{r, echo = F, eval = F}
+
+dev.new()
+library(latex2exp)
+par(
+family      = "sans",
+pty         = "m",
+bty         = "l",
+lwd         = 1,
+las         = 1,
+font.main   = 1,
+cex         = 1.1,
+cex.main    = 1.2)
+colnames(Y) = c("A1B1", "A1B2", "A2B1", "A2B2")
+boxplot(Y)
+dev.copy2pdf(
+file        = file.path(getwd(), "11_Abbildungen", "alm_11_zva_boxplot.pdf"),
+width       = 7,
+height      = 4)
+
+```
+
+\vspace{3mm}
+\center
+```{r, echo = FALSE, out.width = "95%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_boxplot.pdf")
+```
+
+
+# Anwendungsszenario
+
+\textcolor{darkblue}{Haupteffekte (main effects) und Interaktionen (interactions)}
+\small
+
+Man unterscheidet intuitiv hinsichtlich der Gruppenmittelwerte *Haupteffekte*
+und *Interaktionen*
+
+\footnotesize
+* \justifying Intuitiv spricht man vom Vorliegen eines *Haupteffekts von Faktor A*,
+wenn sich die Gruppenmittelwerte zwischen Level 1 und Level 2 von Faktor A,
+jeweils gemittelt über die zwei Level von Faktor B, unterscheiden.
+* Intuitiv spricht man vom Vorliegen eines *Haupteffekts von Faktor B*,
+wenn sich die Gruppenmittelwerte zwischen Level 1 und Level 2 von Faktor B,
+jeweils gemittelt über die zwei Level von Faktor A, unterscheiden.
+* Intuitiv spricht man vom Vorliegen einer *Interaktion der Faktoren A
+und B*, wenn der Unterschied der Gruppenmittelwerte von Faktor A zwischen Level 1 und
+2 unterschiedlich für Level 1 und Level 2 von Faktor B ausgeprägt ist bzw. wenn
+der Unterschied der Gruppenmittelwerte von Faktor B zwischen Level 1 und
+2 unterschiedlich für Level 1 und Level 2 von Faktor A ausgeprägt ist.
+
+
+\small
+Intuitiv beziehen sich Haupteffekte also auf (marginale) Unterschiede (Differenzen),
+während sich Interaktionen auf Unterschiede von Unterschieden (Differenzen von
+Differenzen) beziehen.
+
+Das Vorhandensein einer Interaktion besagt lediglich, dass sich die Unterschiede
+der Gruppenmittelwerte zwischen den Leveln eines experimentellen Faktors in Abhängigkeit
+von den Leveln des anderen experimentellen Faktors ändern, es macht aber keine
+Aussage darüber, warum dies so ist.
+
+\flushright
+$\Rightarrow$ Haupteffekte und Interaktionen sind Datenmuster, keine wissenschaftlichen Theorien.
+
+# Anwendungsszenario
+\vspace{1mm}
+\textcolor{darkblue}{Datendeskription durch Barplot}
+
+```{r, echo = F, eval = F}
+
+# Abbildungsparameter
+dev.new()                                       # Figure Initialisierung
+library(latex2exp)                              # TeX Annotations
+par(                                            # für Details siehe ?par
+family      = "sans",                           # Serif-freier Fonttyp
+pty         = "m",                              # Maximale Abbildungsregion
+bty         = "l",                              # L förmige Box
+lwd         = 1,                                # Liniendicke
+las         = 1,                                # Horizontale Achsenbeschriftung
+font.main   = 1,                                # Non-Bold Titel
+cex         = 1.1,                              # Textvergrößerungsfaktor
+cex.main    = 1.2)                              # Titeltextvergrößerungsfaktor
+
+# Balkendiagramm
+groupmeans  = colMeans(Y)                       # Gruppenmittelwerte
+groupstds   = apply(Y,2,sd)                     # Gruppenmittelwerte
+x = barplot(                                    # Ausgabe der x-Ordinaten (?barplot für Details)
+groupmeans,
+ylim        = c(-1,9),
+col         = "gray90")                         # Balkenfarbe
+
+# Fehlerbalken
+arrows(                                         # für Details siehe ?arrows
+x0          = x,                                # arrow start x-ordinate
+y0          = groupmeans - groupstds,           # arrow start y-ordinate
+x1          = x,                                # arrow end   x-ordinate
+y1          = groupmeans + groupstds,           # arrow end   y-ordinate
+code        = 3,                                # Pfeilspitzen beiderseits
+angle       = 90,                               # Pfeilspitzenwinkel -> Linie
+length      = 0.05)                             # Linienlänge
+
+# PDF Speicherung
+dev.copy2pdf(
+file        = file.path(getwd(), "11_Abbildungen", "alm_11_zva_barplot.pdf"),
+width       = 7,
+height      = 4)
+```
+
+\vspace{3mm}
+\center
+```{r, echo = FALSE, out.width = "95%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_barplot.pdf")
+```
+
+# Anwendungsszenario
+\vspace{2mm}
+\textcolor{darkblue}{Datendeskription durch Lineplot}
+
+```{r, echo = F, eval = F}
+
+# Abbildungsparameter
+dev.new()                                       # Figure Initialisierung
+library(latex2exp)                              # TeX Annotations
+
+
+# data in matrix format
+x           = 1:2
+groupmeans  = matrix(colMeans(Y), nrow = 2)
+groupstds   = matrix(apply(Y, 2, sd), nrow = 2)
+cols        = c("gray30", "gray70")
+lwds        = c(3,1)
+
+# circumvent RMarkdown Beamer interaction
+graphics.off()
+fdir        =  file.path(getwd(), "11_Abbildungen")
+dev.new()
+par(
+family      = "sans",
+pty         = "s",
+bty         = "l",
+lwd         = 1,
+las         = 1,
+mgp         = c(2,1,0),
+xaxs        = "i",
+yaxs        = "i",
+font.main   = 1,
+cex         = 1.5,
+cex.main    = 1)
+
+# Lineplots
+matplot(
+x,
+groupmeans,
+type        = "b",
+pch         = 21,
+xlim        = c(.5,2.5),
+ylim        = c(2,8),
+lty         = 1,
+col         = cols,
+lwd         = lwds,
+xlab        = "Faktor B",
+ylab        = "",
+xaxt        = "n",)
+for(i in 1:2){
+  arrows(                                         # für Details siehe ?arrows
+  x0          = x,                                # arrow start x-ordinate
+  y0          = groupmeans[,i] - groupstds[,i],   # arrow start y-ordinate
+  x1          = x,                                # arrow end   x-ordinate
+  y1          = groupmeans[,i] + groupstds[,i],   # arrow end   y-ordinate
+  col         = cols[[i]],                        # color
+  lwd         = lwds[[i]],                        # linewidth
+  code        = 3,                                # Pfeilspitzen beiderseits
+  angle       = 90,                               # Pfeilspitzenwinkel -> Linie
+  length      = 0.05)
+}
+legend(
+.4,
+8.5,
+c("Faktor A, Level 1", "Faktor A, Level 2"),
+lty         = 1,
+col         = c("gray30", "gray90"),
+lwd         = lwds,
+bty         = "n",
+cex         = 1,
+x.intersp  = .3,
+seg.len     = 0.6,
+)
+text(1,1.5, "Level 1" , xpd = T, cex = 1.1)
+text(2,1.5, "Level 2", xpd = T, cex = 1.1)
+
+# PDF Speicherung
+dev.copy2pdf(
+file        = file.path(getwd(), "11_Abbildungen", "alm_11_zva_lineplot.pdf"),
+width       = 7,
+height      = 7)
+
+```
+
+\vspace{3mm}
+\center
+```{r, echo = FALSE, out.width = "65%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_lineplot.pdf")
+```
+
+# Anwendungsszenario
+\setstretch{1.6}
+\textcolor{darkblue}{Anwendungsbeispiel}
+
+BDI Datenanalyse bei zwei Therapiearten für zwei Altersklassen
+
+\small
+* Faktor (A) Therapie mit Level (1) Face-to-face (F2F) und Level (2) Online (ONL)
+* Faktor (B) Altersklasse  mit Level (1) Young Adults (YA) und (2) und Older Adults (OA)
+* $n_{ij} := 20, 1 \le i,j \le 2$ Patient:innen in jeder Bedingung, $n = 80$ Patient:innen insgesamt.
+
+\normalsize
+2 x 2 randomisiertes zweifaktorielles Studiendesigns $\Rightarrow$ 2 x 2 ANOVA
+
+* Inferentielle Evidenz für einen Haupteffekt der Therapieart?
+* Inferentielle Evidenz für einen Haupteffekt der Altersklasse?
+* Inferentielle Evidenz für Interaktion (Verschiedene Therapieeffekte zwischen Altersklassen)?
+
+
+# Anwendungsszenario
+\textcolor{darkblue}{Anwendungsbeispiel}
+\vspace{1mm}
+\setstretch{1}
+\tiny
+```{r}
+fname       = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D           = read.table(fname, sep = ",", header = TRUE)
+```
+
+```{r, echo = F}
+# table visualization
+knitr::kable(D[c(1:6, 21:26, 41:46, 61:66),2:5],
+             align      = "ccc",
+             "pipe")
+```
+
+# Anwendungsszenario
+\textcolor{darkblue}{Anwendungsbeispiel}
+\vspace{1mm}
+\tiny
+\setstretch{.9}
+```{r}
+# Datenreformatierung
+fname  = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D      = read.table(fname, sep = ",", header = TRUE)
+A1B1   = D$BDI[D$Therapy == "F2F" & D$Age == "YA" ]
+A1B2   = D$BDI[D$Therapy == "F2F" & D$Age == "OA" ]
+A2B1   = D$BDI[D$Therapy == "ONL" & D$Age == "YA" ]
+A2B2   = D$BDI[D$Therapy == "ONL" & D$Age == "OA" ]
+Y      = data.frame("F2F YA" = A1B1, "F2F OA" = A1B2, "ONL YA" = A2B1, "ONL OA" = A2B2)
+```
+```{r, echo = F}
+knitr::kable(Y, row.names = TRUE,  "pipe")
+```
+
+
+# Anwendungsszenario
+\vspace{1mm}
+\textcolor{darkblue}{Datendeskription durch Barplot}
+
+```{r, echo = F, eval = F}
+
+# Abbildungsparameter
+dev.new()                                       # Figure Initialisierung
+library(latex2exp)                              # TeX Annotations
+par(                                            # für Details siehe ?par
+family      = "sans",                           # Serif-freier Fonttyp
+pty         = "m",                              # Maximale Abbildungsregion
+bty         = "l",                              # L förmige Box
+lwd         = 1,                                # Liniendicke
+las         = 1,                                # Horizontale Achsenbeschriftung
+font.main   = 1,                                # Non-Bold Titel
+cex         = 1.1,                              # Textvergrößerungsfaktor
+cex.main    = 1.2)                              # Titeltextvergrößerungsfaktor
+
+# Balkendiagramm
+groupmeans  = colMeans(Y)                       # Gruppenmittelwerte
+groupstds   = apply(Y,2,sd)                     # Gruppenmittelwerte
+x = barplot(                                    # Ausgabe der x-Ordinaten (?barplot für Details)
+groupmeans,
+ylab        = "BDI",
+ylim        = c(0,11),
+col         = "gray90")                         # Balkenfarbe
+
+# Fehlerbalken
+arrows(                                         # für Details siehe ?arrows
+x0          = x,                                # arrow start x-ordinate
+y0          = groupmeans - groupstds,           # arrow start y-ordinate
+x1          = x,                                # arrow end   x-ordinate
+y1          = groupmeans + groupstds,           # arrow end   y-ordinate
+code        = 3,                                # Pfeilspitzen beiderseits
+angle       = 90,                               # Pfeilspitzenwinkel -> Linie
+length      = 0.05)                             # Linienlänge
+
+# PDF Speicherung
+dev.copy2pdf(
+file        = file.path(getwd(), "11_Abbildungen", "alm_11_zva_barplot_beispiel.pdf"),
+width       = 7,
+height      = 4)
+```
+
+\vspace{3mm}
+\center
+```{r, echo = FALSE, out.width = "95%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_barplot_beispiel.pdf")
+```
+
+# Anwendungsszenario
+\vspace{2mm}
+\textcolor{darkblue}{Datendeskription durch Lineplot}
+
+```{r, echo = F, eval = F}
+
+# Abbildungsparameter
+dev.new()                                       # Figure Initialisierung
+library(latex2exp)                              # TeX Annotations
+
+
+# data in matrix format
+x           = 1:2
+groupmeans  = matrix(colMeans(Y), nrow = 2)
+groupstds   = matrix(apply(Y, 2, sd), nrow = 2)
+cols        = c("gray30", "gray70")
+lwds        = c(3,1)
+
+# circumvent RMarkdown Beamer interaction
+graphics.off()
+fdir        =  file.path(getwd(), "11_Abbildungen")
+dev.new()
+par(
+family      = "sans",
+pty         = "s",
+bty         = "l",
+lwd         = 1,
+las         = 1,
+mgp         = c(2,1,0),
+xaxs        = "i",
+yaxs        = "i",
+font.main   = 1,
+cex         = 1.5,
+cex.main    = 1)
+
+# Lineplots
+matplot(
+x,
+groupmeans,
+type        = "b",
+pch         = 21,
+xlim        = c(.5,2.5),
+ylim        = c( 0,12),
+lty         = 1,
+col         = cols,
+lwd         = lwds,
+xlab        = "Age",
+ylab        = "BDI",
+xaxt        = "n",)
+for(i in 1:2){
+  arrows(                                         # für Details siehe ?arrows
+  x0          = x,                                # arrow start x-ordinate
+  y0          = groupmeans[,i] - groupstds[,i],   # arrow start y-ordinate
+  x1          = x,                                # arrow end   x-ordinate
+  y1          = groupmeans[,i] + groupstds[,i],   # arrow end   y-ordinate
+  col         = cols[[i]],                        # color
+  lwd         = lwds[[i]],                        # linewidth
+  code        = 3,                                # Pfeilspitzen beiderseits
+  angle       = 90,                               # Pfeilspitzenwinkel -> Linie
+  length      = 0.05)
+}
+legend(
+.4,
+13.1,
+c("Therapy, F2F", "Therapy, ONL"),
+lty         = 1,
+col         = c("gray30", "gray90"),
+lwd         = lwds,
+bty         = "n",
+cex         = 1,
+x.intersp   = .3,
+y.intersp   = .9,
+seg.len     = 0.6,
+)
+text(1,-1, "Younger Adults" , xpd = T, cex = 1)
+text(2,-1, "Older Adults"   , xpd = T, cex = 1)
+
+# PDF Speicherung
+dev.copy2pdf(
+file        = file.path(getwd(), "11_Abbildungen", "alm_11_zva_lineplot_beispiel.pdf"),
+width       = 7,
+height      = 7)
+
+```
+
+\vspace{3mm}
+\center
+```{r, echo = FALSE, out.width = "60%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_lineplot_beispiel.pdf")
+```
+
+#
+\large
+\setstretch{2.7}
+\vfill
+Anwendungsszenario
+
+**Modellformulierung**
+
+Modellschätzung
+
+Modellevaluation
+
+Selbstkontrollfragen
+\vfill
+
+# Modellformulierung
+\vspace{1mm}
+\textcolor{darkblue}{Modell der additiven ZVA}
+\setstretch{1.2}
+\footnotesize
+
+In Analogie zur einfaktoriellen Varianzanalyse (EVA) möchte man in der additiven ZVA die
+Gruppenerwartungswerte $\mu_{ij}$ mit $i = 1,...,I$ für die Level von Faktor A
+und $j = 1,...,J$ für die Level von Faktor B als Summe eines gruppenunspezifischen
+Erwartungswertes und den Effekten der Level von Faktor A und der Level von Faktor B
+modellieren.
+
+Wir bezeichnen den gruppenunspezifischen Erwartungswertparameter mit $\mu_0$, den
+Effekt von Level $i$ von Faktor A mit $\alpha_i$ und den Effekt von Level $j$ von
+Faktor B mit $\beta_j$ ($\beta_j$ bezeichnet hier also \underline{nicht} den $j$ten
+Eintrag des Betaparametervektors). Dann ergibt sich zum Beispiel für $I := J := 2$
+\begin{center}
+\begin{tabular}{l|l}
+$\mu_{11} := \mu_0 + \alpha_1 + \beta_1$ & $\mu_{12} := \mu_0 + \alpha_1 + \beta_2$ \\\hline
+$\mu_{21} := \mu_0 + \alpha_2 + \beta_1$ & $\mu_{22} := \mu_0 + \alpha_2 + \beta_2$ \\
+\end{tabular}
+\end{center}
+Wie im Falle der EVA ist diese Darstellung der Gruppenerwartungswerte $\mu_{ij}$
+allerdings überparameterisiert. Um eine eindeutige Darstellung der $\mu_{ij}$ zu
+gewährleisten, bietet sich auch hier die Restriktion an, den Effekt des ersten
+Levels jedes Faktors als Null zu definieren
+\begin{equation}
+\alpha_1 := \beta_1 := 0.
+\end{equation}
+und damit die Faktorlevelkombination A1B1 als Referenzgruppe zu etablieren. Es
+ergibt sich somit zum Beispiel für für $I := J := 2$
+\begin{center}
+\begin{tabular}{l|l}
+$\mu_{11} := \mu_0$            & $\mu_{12} := \mu_0 + \beta_2$            \\\hline
+$\mu_{21} := \mu_0 + \alpha_2$ & $\mu_{22} := \mu_0 + \alpha_2 + \beta_2$ \\
+\end{tabular}
+\end{center}
+Auch bei dieser Effektdarstellung des Modells der additiven 2 x 2 ZVA mit Referenzgruppe
+ändern sich die Interpretation der Parameter $\mu_0,\alpha_2,\beta_2$ im Vergleich
+zum überparameterisierten Fall ohne Referenzgruppe: $\mu_0$ entspricht dem Erwartungswert
+der Faktorlevelkombination A1B1, $\alpha_2$ der Differenz beim Übergang von Level 1
+zu Level 2 von Faktor A und  $\beta_2$ der Differenz beim Übergang von Level 1
+zu Level 2 von Faktor B.
+
+# Modellformulierung
+\footnotesize
+\begin{definition}[Modell der additiven ZVA mit Referenzgruppe]
+\justifying
+$y_{ijk}$ mit $i = 1,...,I, j = 1,...,J, k = 1,...,n_{ij}$ sei die Zufallsvariable,
+die den $k$ten Datenpunkt zum $i$ten Level von Faktor A und dem $j$ten Level von
+Faktor B in einem ZVA Anwendungsszenario modelliert. Dann hat das
+\textit{Modell der additiven ZVA mit Referenzgruppe} die strukturelle Form
+\begin{equation}
+y_{ijk} = \mu_{ij} + \varepsilon_{ijk} \sim N(0,\sigma^2)
+\mbox{ u.i.v. für } i = 1,...,I, j = 1,...,J, k = 1,...,n_{ij}
+\end{equation}
+und die Datenverteilungsform
+\begin{equation}
+y_{ijk} \sim N(\mu_{ij}, \sigma^2) \mbox{ u.i.v. für } i = 1,...,I, j = 1,...,J, k = 1,...,n_{ij}
+\end{equation}
+mit
+\begin{equation}
+\mu_{ij} := \mu_0 + \alpha_i + \beta_j \mbox{ für } i = 1,...,I, j = 1,...,J \mbox{ mit } \alpha_1 := \beta_1 := 0.
+\end{equation}
+und $\sigma^2 > 0$.
+\end{definition}
+Bemerkungen
+
+* Das Modell der additiven ZVA modelliert ausschließlich Haupteffekte, keine Interaktionen.
+* Wir verzichten auf die Angabe einer allgemeinen Designmatrixform dieses Modells.
+
+
+# Modellformulierung
+\textcolor{darkblue}{Parameterbeispiele}
+
+\small
+\setstretch{1.5}
+\noindent (1) Es sei $\mu_0 := 1, \alpha_2 := 1, \beta_2 := 0$. Dann gilt:
+
+\begin{center}
+\begin{tabular}{ll}
+$\bm{\mu_{11}} = \mu_0 + \alpha_1 + \beta_1 = 1 + 0 + 0 = \bm{1}$
+&
+$\bm{\mu_{12}} = \mu_0 + \alpha_1 + \beta_2 = 1 + 0 + 0 = \bm{1}$
+\\
+$\bm{\mu_{21}} = \mu_0 + \alpha_2 + \beta_1 = 1 + 1 + 0 = \bm{2}$
+&
+$\bm{\mu_{22}} = \mu_0 + \alpha_2 + \beta_2 = 1 + 1 + 0 = \bm{2}$ \\
+\end{tabular}
+\end{center}
+$\Rightarrow$ Haupteffekt von Faktor A, kein Haupteffekt von Faktor B
+\vspace{1mm}
+
+\noindent (2) Es sei $\mu_0 := 1, \alpha_2 := 0, \beta_2 := 1$. Dann gilt:
+
+\begin{center}
+\begin{tabular}{ll}
+$\bm{\mu_{11}} = \mu_0 + \alpha_1 + \beta_1 = 1 + 0 + 0 = \bm{1}$
+&
+$\bm{\mu_{12}} = \mu_0 + \alpha_1 + \beta_2 = 1 + 0 + 1 = \bm{2}$
+\\
+$\bm{\mu_{21}} = \mu_0 + \alpha_2 + \beta_1 = 1 + 0 + 0 = \bm{1}$
+&
+$\bm{\mu_{22}} = \mu_0 + \alpha_2 + \beta_2 = 1 + 0 + 1 = \bm{2}$ \\
+\end{tabular}
+\end{center}
+$\Rightarrow$ Kein Haupteffekt von Faktor A, Haupteffekt von Faktor B
+\vspace{1mm}
+
+\noindent (3) Es sei $\mu_0 := 1, \alpha_2 := 1, \beta_2 := 1$. Dann gilt:
+
+\begin{center}
+\begin{tabular}{ll}
+$\bm{\mu_{11}} = \mu_0 + \alpha_1 + \beta_1 = 1 + 0 + 0 = \bm{1}$
+&
+$\bm{\mu_{12}} = \mu_0 + \alpha_1 + \beta_2 = 1 + 0 + 1 = \bm{2}$
+\\
+$\bm{\mu_{21}} = \mu_0 + \alpha_2 + \beta_1 = 1 + 1 + 0 = \bm{2}$
+&
+$\bm{\mu_{22}} = \mu_0 + \alpha_2 + \beta_2 = 1 + 1 + 1 = \bm{3}$ \\
+\end{tabular}
+\end{center}
+$\Rightarrow$ Haupteffekt von Faktor A, Haupteffekt von Faktor B
+
+
+# Modellformulierung
+\vspace{1mm}
+\textcolor{darkblue}{Parameterbeispiele}
+```{r, echo = F, eval = F}
+
+# circumvent RMarkdown Beamer Interaction
+graphics.off()
+fdir        =  file.path(getwd(), "11_Abbildungen")
+dev.new()
+par(
+mfcol       = c(2,3),
+family      = "sans",
+pty         = "s",
+bty         = "l",
+lwd         = 1,
+las         = 1,
+mgp         = c(2,1,0),
+xaxs        = "i",
+yaxs        = "i",
+font.main   = 1,
+cex         = 1.2,
+cex.main    = 1.2)
+mu          = list(matrix(c(1,1,2,2) , ncol = 2),
+                   matrix(c(1,2,1,2) , ncol = 2),
+                   matrix(c(1,2,2,3) , ncol = 2))
+labs        = list(TeX("$\\mu_0 = 1,\\, \\alpha_2 = 1,\\, \\beta_2 = 0$"),
+                   TeX("$\\mu_0 = 1,\\, \\alpha_2 = 0,\\, \\beta_2 = 1$"),
+                   TeX("$\\mu_0 = 1,\\, \\alpha_2 = 1,\\, \\beta_2 = 1$"))
+for(i in 1:3){
+
+    # Barplot
+    B        = as.vector(mu[[i]])
+    names(B) = c("A1B1", "A1B2", "A2B1", "A2B2")
+    barplot(
+    B,
+    ylim        = c(0,3.5),
+    main        = labs[[i]],
+    col         = "gray90")
+
+    # Lineplot
+    matplot(
+    1:2,
+    mu[[i]],
+    type        = "b",
+    pch         = 21,
+    ylim        = c( 0,5),
+    xlim        = c(.5,2.5),
+    lty         = 1,
+    col         = c("gray30", "gray70"),
+    lwd         = c(3,1),
+    main        = labs[[i]],
+    xlab        = "Faktor B",
+    ylab        = "",
+    xaxt      = "n",)
+    legend(
+    0.01,
+    6.00,
+    c("Faktor A, Level 1", "Faktor A, Level 2"),
+    lty         = 1,
+    col         = c("gray30", "gray90"),
+    lwd         = c(3,1),
+    bty         = "n",
+    seg.len     = .4,
+    x.intersp   = .3,
+    y.intersp   = .2,
+    cex         =  1,
+    )
+    text(1,-.4, "Level 1", xpd = T)
+    text(2,-.4, "Level 2", xpd = T)
+}
+dev.copy2pdf(
+file        = file.path(fdir, "alm_11_zva_add_beispiel.pdf"),
+width       = 15,
+height      = 10)
+```
+
+\vfill
+\vspace{3mm}
+\center
+```{r, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_add_beispiel.pdf")
+```
+\vfill
+
+# Modellformulierung
+\footnotesize
+\setstretch{1.2}
+\vspace{2mm}
+\begin{theorem}[Designmatrixform des Modells der 2 x 2 ZVA mit Referenzgruppe]
+\justifying
+\normalfont
+Gegeben sei die strukturelle Form des Modells der 2 x 2 ZVA mit Referenzgruppe. 
+Dann hat dieses Modell die Designmatrixform
+\begin{equation}
+y \sim N(X\beta,\sigma^2I_n),
+\end{equation}
+wobei
+\begin{equation}
+y:=
+\begin{pmatrix}
+y_{111}\\
+\vdots \\
+y_{11n_{11}}\\
+y_{121}\\
+\vdots \\
+y_{12n_{12}}\\
+y_{211}\\
+\vdots \\
+y_{21n_{21}}\\
+y_{221}\\
+\vdots \\
+y_{22n_{22}}\\
+\end{pmatrix}, \,
+X =
+\begin{pmatrix}
+1 		& 	0 		& 	0 		 	\\
+\vdots	&	\vdots	& 	\vdots	 	\\
+1 		& 	0 		& 	0 		 	\\
+1 		& 	0 		& 	1 	 		\\
+\vdots	&	\vdots	& 	\vdots	 	\\
+1 		& 	0 		& 	1 			\\
+1 		& 	1		& 	0 			\\
+\vdots	&	\vdots	& 	\vdots 	    \\
+1 		& 	1 		& 	0 		 	\\
+1 		& 	1 		& 	1 		 	\\
+\vdots	&	\vdots	& 	\vdots	 	\\
+1 		& 	1 		& 	1 		 	\\
+\end{pmatrix} \in \mathbb{R}^{n \times 3}, \,
+\beta :=
+\begin{pmatrix}
+\mu_0				\\
+\alpha_{2}			\\
+\beta_{2}			\\
+\end{pmatrix}
+\in \mathbb{R}^{3}
+\mbox{ und }
+\sigma^2 > 0.
+\end{equation}
+\end{theorem}
+\vspace{-2mm}
+Bemerkung
+\vspace{-1mm}
+
+* Das Theorem folgt direkt aus den Regel der Matrixmultiplikation.
+
+# Modellformulierung
+\textcolor{darkblue}{Modell der ZVA mit Interaktion}
+\footnotesize
+\setstretch{1.1}
+
+In der ZVA mit Interaktion möchte man die Gruppenerwartungswerte $\mu_{ij}$ mit
+$i = 1,...,I$ für die Level von Faktor A und $j = 1,...,J$ für die Level von Faktor B
+als Summe eines gruppenunspezifischen Erwartungswertes, der Effekte der Level
+von Faktor A und Faktor B und der Interaktion der Level der Faktoren modellieren.
+
+Wir bezeichnen den gruppenunspezifischen Erwartungswertparameter mit $\mu_0$, den
+Effekt von Level $i$ von Faktor A mit $\alpha_i$, den Effekt von Level $j$ von
+Faktor B mit $\beta_j$, und die Interaktion von Level $i$ von Faktor A mit Level
+$j$ von Faktor B mit $\gamma_{ij}$. Dann ergibt sich zum Beispiel für $I := J := 2$
+\begin{center}
+\begin{tabular}{l|l}
+$\mu_{11} := \mu_0 + \alpha_1 + \beta_1 + \gamma_{11}$ & $\mu_{12} := \mu_0 + \alpha_1 + \beta_2 + \gamma_{12}$ \\\hline
+$\mu_{21} := \mu_0 + \alpha_2 + \beta_1 + \gamma_{21}$ & $\mu_{22} := \mu_0 + \alpha_2 + \beta_2 + \gamma_{22}$ \\
+\end{tabular}
+\end{center}
+Wie in der die additiven ZVA ist diese Darstellung der Gruppenerwartungswerte
+$\mu_{ij}$ multipel überparameterisiert. Um eine eindeutige Darstellung der $\mu_{ij}$ zu
+gewährleisten, bietet sich auch hier die Restriktion an, den Effekt des ersten
+Levels jedes Faktors und jeder Interaktion als Null zu definieren
+\begin{equation}
+\alpha_1 := \beta_1 := \gamma_{i1} := \gamma_{1j} := 0 \mbox{ für } i = 1,...,I, j = 1,..,J
+\end{equation}
+und damit die Faktorlevelkombination A1B1 als Referenzgruppe zu etablieren. Es
+ergibt sich somit zum Beispiel für für $I := J := 2$
+\begin{center}
+\begin{tabular}{l|l}
+$\mu_{11} := \mu_0$            & $\mu_{12} := \mu_0 + \beta_2$                          \\\hline
+$\mu_{21} := \mu_0 + \alpha_2$ & $\mu_{22} := \mu_0 + \alpha_2 + \beta_2 + \gamma_{22}$ \\
+\end{tabular}
+\end{center}
+Auch bei dieser Effektdarstellung des Modells der 2 x 2 ZVA mit Interaktion und Referenzgruppe
+ändern sich die Interpretation der Parameter $\mu_0,\alpha_2,\beta_2,\gamma_{22}$ im Vergleich
+zum überparameterisierten Fall ohne Referenzgruppe: $\mu_0$ entspricht dem Erwartungswert
+der Faktorlevelkombination A1B1, $\alpha_2$ der Differenz beim Übergang von Level 1
+zu Level 2 von Faktor A, $\beta_2$ der Differenz beim Übergang von Level 1 zu Level 2
+von Faktor B und $\gamma_{22}$ der Differenz beim Übergang von Level 1 zu Level 2 von
+Faktor B im Unterschiede zum Übergang von Level 1 zu Level 2 von Faktor A.
+
+# Modellformulierung
+
+
+\footnotesize
+\begin{definition}[Modell der ZVA mit Interaktion und Referenzgruppe]
+\justifying
+$y_{ijk}$ mit $i = 1,...,I, j = 1,...,J, k = 1,...,n_{ij}$ sei die Zufallsvariable,
+die den $k$ten Datenpunkt zum $i$ten Level von Faktor A und dem $j$ten Level von
+Faktor B in einem ZVA Anwendungsszenario modelliert. Dann hat das
+\textit{Modell der ZVA mit Interaktion und Referenzgruppe} die strukturelle Form
+\begin{equation}
+y_{ijk} = \mu_{ij} + \varepsilon_{ijk} \sim N(0,\sigma^2)
+\mbox{ u.i.v. für } i = 1,...,I, j = 1,...,J, k = 1,...,n_{ij}
+\end{equation}
+und die Datenverteilungsform
+\begin{equation}
+y_{ijk} \sim N(\mu_{ij}, \sigma^2) \mbox{ u.i.v. für } i = 1,...,I, j = 1,...,J, k = 1,...,n_{ij}
+\end{equation}
+mit
+\begin{equation}
+\mu_{ij} := \mu_0 + \alpha_i + \beta_j + \gamma_{ij}
+\end{equation}
+sowie
+\begin{equation}
+\alpha_1 := \beta_1 := \gamma_{i1} := \gamma_{1j} :=0 \mbox{ für } i = 1,...,I, j = 1,...,J
+\end{equation}
+und $\sigma^2 > 0$.
+\end{definition}
+Bemerkungen
+
+* Wir verzichten auf die Angabe einer allgemeinen Designmatrixform dieses Modells.
+
+
+# Modellformulierung
+\setstretch{1}
+\textcolor{darkblue}{Parameterbeispiele}
+
+\footnotesize
+\noindent (1) Es sei $\mu_0 := 1, \alpha_2 := 0, \beta_2 := 0, \gamma_{22} = 2$. Dann gilt:
+\begin{tiny}
+\begin{tabular}{ll}
+$\bm{\mu_{11}} = \mu_0 + \alpha_1 + \beta_1 + \gamma_{11} = 1 + 0 + 0 + 0=  \bm{1}$
+&
+$\bm{\mu_{12}} = \mu_0 + \alpha_1 + \beta_2 + \gamma_{12} = 1 + 0 + 0 + 0 = \bm{1}$
+\\\\
+$\bm{\mu_{21}} = \mu_0 + \alpha_2 + \beta_1 + \gamma_{21} = 1 + 0 + 0 + 0 = \bm{1}$
+&
+$\bm{\mu_{22}} = \mu_0 + \alpha_2 + \beta_2 + \gamma_{22} = 1 + 0 + 0 + 2 = \bm{3}$ \\
+\end{tabular}
+\end{tiny}
+\vspace{2mm}
+\footnotesize
+\noindent (2) Es sei $\mu_0 := 1, \alpha_2 := 1, \beta_2 := 1, \gamma_{22} = -2$. Dann gilt:
+\begin{tiny}
+\begin{tabular}{ll}
+$\bm{\mu_{11}} = \mu_0 + \alpha_1 + \beta_1 + \gamma_{11} = 1 + 0 + 0 + 0=  \bm{1}$
+&
+$\bm{\mu_{12}} = \mu_0 + \alpha_1 + \beta_2 + \gamma_{12} = 1 + 0 + 1 + 0 = \bm{2}$
+\\\\
+$\bm{\mu_{21}} = \mu_0 + \alpha_2 + \beta_1 + \gamma_{21} = 1 + 0 + 1 + 0 = \bm{2}$
+&
+$\bm{\mu_{22}} = \mu_0 + \alpha_2 + \beta_2 + \gamma_{22} = 1 + 1 + 1 - 2 = \bm{1}$ \\
+\end{tabular}
+\end{tiny}
+\vspace{2mm}
+
+\noindent (3) Es sei $\mu_0 := 1, \alpha_2 := 1, \beta_2 := 0, \gamma_{22} = 1$. Dann gilt:
+\begin{tiny}
+\begin{tabular}{ll}
+$\bm{\mu_{11}} = \mu_0 + \alpha_1 + \beta_1 + \gamma_{11} = 1 + 0 + 0 + 0 = \bm{1}$
+&
+$\bm{\mu_{12}} = \mu_0 + \alpha_1 + \beta_2 + \gamma_{12} = 1 + 0 + 0 + 0 = \bm{1}$
+\\\\
+$\bm{\mu_{21}} = \mu_0 + \alpha_2 + \beta_1 + \gamma_{21} = 1 + 1 + 0 + 0 = \bm{2}$
+&
+$\bm{\mu_{22}} = \mu_0 + \alpha_2 + \beta_2 + \gamma_{22} = 1 + 1 + 0 + 1 = \bm{3}$ \\
+\end{tabular}
+\end{tiny}
+\vspace{2mm}
+
+\noindent (4) Es sei $\mu_0 := 1, \alpha_2 := 0, \beta_2 := 1, \gamma_{22} = 1$. Dann gilt:
+\begin{tiny}
+\begin{tabular}{ll}
+$\bm{\mu_{11}} = \mu_0 + \alpha_1 + \beta_1 + \gamma_{11} = 1 + 0 + 0 + 0=  \bm{1}$
+&
+$\bm{\mu_{12}} = \mu_0 + \alpha_1 + \beta_2 + \gamma_{12} = 1 + 0 + 1 + 0 = \bm{2}$
+\\\\
+$\bm{\mu_{21}} = \mu_0 + \alpha_2 + \beta_1 + \gamma_{21} = 1 + 0 + 0 + 0 = \bm{1}$
+&
+$\bm{\mu_{22}} = \mu_0 + \alpha_2 + \beta_2 + \gamma_{22} = 1 + 0 + 1 + 1 = \bm{3}$ \\
+\end{tabular}
+\end{tiny}
+
+# Modellformulierung
+```{r, echo = F, eval = F}
+
+# Circumvent RMarkdown Beamer Interaction
+graphics.off()
+fdir        =  file.path(getwd(), "11_Abbildungen")
+dev.new()
+par(
+mfcol       = c(2,4),
+family      = "sans",
+pty         = "s",
+bty         = "l",
+lwd         = 1,
+las         = 1,
+mgp         = c(2,1,0),
+xaxs        = "i",
+yaxs        = "i",
+font.main   = 1,
+cex         = 1.1,
+cex.main    = 1)
+mu          = list(matrix(c(1,1,1,3), ncol = 2),
+                   matrix(c(1,2,2,1), ncol = 2),
+                   matrix(c(1,1,2,3), ncol = 2),
+                   matrix(c(1,2,1,3), ncol = 2))
+labs        = list(TeX("$\\mu_0 = 1, \\, \\alpha_2 = 0, \\, \\beta_2 =  0,\\, \\gamma_{22} =  2$"),
+                   TeX("$\\mu_0 = 1, \\, \\alpha_2 = 1, \\, \\beta_2 =  1,\\, \\gamma_{22} = -2$"),
+                   TeX("$\\mu_0 = 1, \\, \\alpha_2 = 1, \\, \\beta_2 =  0,\\, \\gamma_{22} =  1$"),
+                   TeX("$\\mu_0 = 1, \\, \\alpha_2 = 0, \\, \\beta_2 =  1,\\, \\gamma_{22} =  1$"))
+
+for(i in 1:4){
+
+    # Barplot
+    B        = as.vector(mu[[i]])
+    names(B) = c("A1B1", "A1B2", "A2B1", "A2B2")
+    barplot(
+    B,
+    ylim        = c(0,4),
+    main        = labs[[i]],
+    col         = "gray90")
+
+    # Lineplot
+    matplot(
+    1:2,
+    mu[[i]],
+    type        = "b",
+    pch         = 21,
+    ylim        = c( 0,4.5),
+    xlim        = c(.5,2.5),
+    lty         = 1,
+    col         = c("gray30", "gray70"),
+    lwd         = c(3,1),
+    main        = labs[[i]],
+    xlab        = "Faktor B",
+    ylab        = "",
+    xaxt      = "n",)
+    legend(
+    .2,
+    5,
+    c("Faktor A, Level 1", "Faktor A, Level 2"),
+    lty         = 1,
+    col         = c("gray30", "gray90"),
+    lwd         = c(3,1),
+    bty         = "n",
+    seg.len     = .5,
+    x.intersp   = .1,
+    y.intersp   = .4,
+    cex         = .7,
+    )
+    text(1,-.5, "Level 1", xpd = T)
+    text(2,-.5, "Level 2", xpd = T)
+}
+dev.copy2pdf(
+file        = file.path(fdir, "alm_11_zva_int_beispiel.pdf"),
+width       = 15,
+height      = 10)
+```
+\vspace{2mm}
+\textcolor{darkblue}{Parameterbeispiele}
+\center
+```{r, echo = FALSE, out.width = "100%"}
+knitr::include_graphics("11_Abbildungen/alm_11_zva_int_beispiel.pdf")
+```
+
+
+# Modellformulierung
+\footnotesize
+\setstretch{1.2}
+\vspace{2mm}
+\begin{theorem}[\small Designmatrixform des Modells der 2 x 2 ZVA mit Interaktion und Referenzgruppe]
+\justifying
+\normalfont
+Gegeben sei die strukturelle Form eines 2 x 2 ZVA Modells mit Interaktion und Referenzgruppe
+und es sei
+\begin{equation}
+n := \sum_{i=1}^2 \sum_{i=1}^2 n_{ij}
+\end{equation}
+die Gesamtanzahl an Datenvariablen. Dann hat dieses Modell die Designmatrixform
+\begin{equation}
+y \sim N(X\beta,\sigma^2I_n), \mbox{ mit }
+\end{equation}
+\begin{equation}
+y:=
+\begin{pmatrix}
+y_{111}\\
+\vdots \\
+y_{11n_{11}}\\
+y_{121}\\
+\vdots \\
+y_{12n_{12}}\\
+y_{211}\\
+\vdots \\
+y_{21n_{21}}\\
+y_{221}\\
+\vdots \\
+y_{22n_{22}}\\
+\end{pmatrix}, \,
+X =
+\begin{pmatrix}
+1 		& 	0 		& 	0 		 & 	0	    \\
+\vdots	&	\vdots	& 	\vdots	 & 	\vdots	\\
+1 		& 	0 		& 	0 		 & 	0	    \\
+1 		& 	0 		& 	1 	 	 & 	0       \\
+\vdots	&	\vdots	& 	\vdots	 & 	\vdots	\\
+1 		& 	0 		& 	1 		 & 	0	    \\
+1 		& 	1		& 	0 		 & 	0	    \\
+\vdots	&	\vdots	& 	\vdots 	 & 	\vdots  \\
+1 		& 	1 		& 	0 		 & 	0    	\\
+1 		& 	1 		& 	1 		 & 	1     	\\
+\vdots	&	\vdots	& 	\vdots	 & 	\vdots	\\
+1 		& 	1 		& 	1 		 & 	1	    \\
+\end{pmatrix} \in \mathbb{R}^{n \times 4}, \,
+\beta :=
+\begin{pmatrix}
+\mu_0				\\
+\alpha_{2}			\\
+\beta_{2}			\\
+\gamma_{22}
+\end{pmatrix}
+\in \mathbb{R}^{4}
+\mbox{ und }
+\sigma^2 > 0.
+\end{equation}
+\end{theorem}
+
+# Modellformulierung
+\textcolor{darkblue}{Beispiel}
+
+\footnotesize
+Es seien
+\begin{equation}
+I := 2, J := 2 \mbox{ und } n_{ij} := 4 \mbox{ für } i = 1,2, j = 1,2 \mbox{, also } n = 16.
+\end{equation}
+Dann gilt
+\begin{equation}
+y = X\beta + \varepsilon \mbox{ mit } \varepsilon \sim N(0_{16},\sigma^2 I_{16})
+\end{equation}
+mit
+\footnotesize
+\begin{equation}
+y :=
+\begin{pmatrix}
+y_{111}	\\
+y_{112} \\
+y_{113} \\
+y_{114} \\
+y_{121} \\
+y_{122} \\
+y_{123} \\
+y_{124} \\
+y_{211} \\
+y_{212} \\
+y_{213} \\
+y_{214} \\
+y_{221} \\
+y_{222} \\
+y_{223} \\
+y_{224}
+\end{pmatrix},
+\,
+X :=
+\begin{pmatrix}
+1  &  0	 &   0	 &  0  \\
+1  &  0  &   0   &  0  \\
+1  &  0  &	 0   &  0  \\
+1  &  0	 &	 0   & 	0  \\
+1  &  0  &	 1   & 	0  \\
+1  &  0  &	 1	 & 	0  \\
+1  &  0	 &	 1   & 	0  \\
+1  &  0  &   1	 & 	0  \\
+1  &  1  &   0	 & 	0  \\
+1  &  1	 &   0   & 	0  \\
+1  &  1  &	 0	 & 	0  \\
+1  &  1	 &	 0   & 	0  \\
+1  &  1	 &   1	 & 	1  \\
+1  &  1	 &   1   & 	1  \\
+1  &  1  &	 1	 & 	1  \\
+1  &  1	 &	 1   & 	1  \\
+\end{pmatrix}
+\in \mathbb{R}^{16 \times 4},
+\,
+\beta :=
+\begin{pmatrix}
+\mu_0 		\\
+\alpha_2	\\
+\beta_2	    \\
+\gamma_{22}	\\
+\end{pmatrix}
+\in \mathbb{R}^{4}
+\mbox{ und }
+\sigma^2 > 0.
+\end{equation}
+
+# Modellformulierung
+\vspace{2mm}
+\textcolor{darkblue}{Beispiel}
+\vspace{1mm}
+\tiny
+\setstretch{.85}
+
+```{r}
+# Modellformulierung
+library(MASS)                               # Multivariate Normalverteilung
+I      = 2                                  # Anzahl Level Faktor A
+J      = 2                                  # Anzahl Level Faktor B
+n_ij   = 4                                  # Anzahl von Datenpunkten der i,jten Gruppe
+n      = I*J*n_ij                           # Anzahl Datenpunkte
+p      = 1 + (I-1)+(J-1)+(I*J-3)            # Anzahl Parameter
+D      = matrix(c(1,0,0,0,                  # Prototypische Designmatrix für balancierte Designs
+                  1,0,1,0,
+                  1,1,0,0,
+                  1,1,1,1),
+                nrow  = p,
+                byrow = TRUE)
+C      = matrix(rep(1,n_ij),nrow = n_ij)    # Prototypischer Zellenvektor für balancierte Designs
+X      = kronecker(D,C)                     # Kroneckerprodukt Designmatrix Erzeugung für balancierte Designs
+I_n    = diag(n)                            # n x n Einheitsmatrix
+beta   = matrix(c(1,1,1,1), nrow = p)       # \beta = (\mu_0,\alpha_2,\alpha_3,\alpha_4)
+sigsqr = 10                                 # \sigma^2
+
+# Datenrealisierung
+y      = mvrnorm(1, X %*% beta, sigsqr*I_n) # eine Realisierung eines n-dimensionalen ZVs
+print(X)
+```
+
+
+# Modellformulierung
+\vspace{2mm}
+\textcolor{darkblue}{Beispieldatensatzerzeugung}
+\vspace{1mm}
+\tiny
+\setstretch{1}
+
+```{r, warning=FALSE}
+# Datensimulation
+library(MASS)                                            # Multivariate Normalverteilung
+set.seed(1)                                              # reproduzierbare Daten
+I             = 2                                        # Anzahl Level Faktor A (Therapie)
+J             = 2                                        # Anzahl Level Faktor B (Alter)
+n_ij          = 20                                       # Anzahl von Datenpunkten der i,jten Gruppe
+n             = I*J*n_ij                                 # Anzahl Datenpunkte
+p             = 1 + (I-1)+(J-1)+(I*J-3)                  # Anzahl Parameter
+D             = matrix(c(1,0,0,0,                        # Prototypische Designmatrix für balancierte Designs
+                         1,0,1,0,
+                         1,1,0,0,
+                         1,1,1,1),
+                nrow  = p,
+                byrow = TRUE)
+C             = matrix(rep(1,n_ij),nrow = n_ij)          # Prototypischer Zellenvektor für balancierte Designs
+X             = kronecker(D,C)                           # Kroneckerprodukt für balancierte Designs
+I_n           = diag(n)                                  # n x n Einheitsmatrix
+beta          = matrix(c(7,-3,0,-2), nrow = p)           # \beta = (\mu_0,\alpha_2,\beta_2,\gamma_22)
+sigsqr        = 4                                        # \sigma^2
+y             = mvrnorm(1, X %*% beta, sigsqr*I_n)       # eine Realisierung eines n-dimensionalen ZVs
+
+# Dataframeformatierung
+library(writexl)                                         # Excel Output
+D            = data.frame("ID" = 1:n)                    # Dataframe Initialisierung und ID Variable
+D$Therapy    = c(rep("F2F", J*n_ij), rep("ONL", J*n_ij)) # Therapiebedingung
+D$Age        = rep(c(rep("YA", n_ij), rep("OA",n_ij)),I) # Alter
+D$BDI        = y                                         # PrePost-BDI Differenzwerte
+
+# Datenspeicherung
+write_xlsx(D, file.path(getwd()       , "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.xlsx"))
+write.csv( D, file = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv"))
+```
+
+#
+\large
+\setstretch{2.7}
+\vfill
+Anwendungsszenario
+
+Modellformulierung
+
+**Modellschätzung**
+
+Modellevaluation
+
+Selbstkontrollfragen
+\vfill
+
+# Modellschätzung
+\footnotesize
+\begin{theorem}[\begin{small} Betaparameterschätzung im additiven 2 x 2 ZVA Modell mit Referenzgruppe \end{small}]
+\justifying
+\normalfont
+Gegeben sei die Designmatrixform eines balancierten additiven 2 x 2 ZVA Modells mit
+Referenzgruppe. Dann ergibt sich für den Betaparameterschätzer
+\begin{equation}
+\hat{\beta} :=
+\begin{pmatrix}
+\hat{\mu}_0       \\
+\hat{\alpha}_2    \\
+\hat{\beta}_2     \\
+\end{pmatrix}
+=
+\begin{pmatrix}
+\frac{3}{4}\bar{y}_{11} + \frac{1}{4}(\bar{y}_{12} + \bar{y}_{21}) - \frac{1}{4}\bar{y}_{22} \\
+\frac{1}{2}(\bar{y}_{21} + \bar{y}_{22}) - \frac{1}{2}(\bar{y}_{11} + \bar{y}_{12})           \\
+\frac{1}{2}(\bar{y}_{12} + \bar{y}_{22}) - \frac{1}{2}(\bar{y}_{11} + \bar{y}_{21})           \\
+\end{pmatrix},
+\end{equation}
+wobei
+\begin{equation}
+\bar{y}_{ij} := \frac{1}{n_{ij}}\sum_{k = 1}^{n_{ij}} y_{ijk} \mbox{ für } 1 \le i,j \le 2
+\end{equation}
+das Stichprobenmittel der $i,j$ten Gruppe des 2 x 2 ZVA Designs bezeichnet.
+\end{theorem}
+
+\footnotesize
+\underline{Beweis}
+
+Wir bestimmen zunächst $X^Ty, X^TX$ und $(X^TX)^{-1}$ bei konstantem $n_{ij}$ für $1 \le i,j \le 2$.
+
+# Modellschätzung
+\footnotesize
+\vspace{1mm}
+\underline{Beweis (fortgeführt)}
+
+\tiny
+\begin{align}
+\renewcommand{\arraystretch}{1.2}
+\begin{split}
+X^Ty
+& =
+\setcounter{MaxMatrixCols}{20}
+\begin{pmatrix}
+1 & \cdots & 1 & 1 & \cdots & 1 & 1 & \cdots & 1 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 0 & \cdots & 0 & 1 & \cdots & 1 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 1 & \cdots & 1 & 0 & \cdots & 0 & 1 & \cdots & 1  	\\
+\end{pmatrix}
+\begin{pmatrix*}[l]
+y_{111} 	\\ 	\vdots 	\\ y_{11n_{11}}
+\\
+y_{121} 	\\ 	\vdots 	\\ y_{12n_{12}}
+\\
+y_{211} 	\\ 	\vdots 	\\ y_{21n_{21}}
+\\
+y_{221} 	\\ 	\vdots 	\\ y_{22n_{22}}
+\end{pmatrix*}
+\\
+& =
+\begin{pmatrix*}[l]
+\sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk} 	\\
+\sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}               	\\
+\sum_{i=1}^2 \sum_{k = 1}^{n_{i2}} y_{i2k} 	                \\
+\end{pmatrix*}.
+\end{split}
+\end{align}
+
+# Modellschätzung
+\footnotesize
+\vspace{1mm}
+\underline{Beweis (fortgeführt)}
+
+
+\tiny
+\begin{align}
+\renewcommand{\arraystretch}{1}
+\begin{split}
+X^TX
+& =
+\setcounter{MaxMatrixCols}{20}
+\begin{pmatrix}
+1 & \cdots & 1 & 1 & \cdots & 1 & 1 & \cdots & 1 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 0 & \cdots & 0 & 1 & \cdots & 1 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 1 & \cdots & 1 & 0 & \cdots & 0 & 1 & \cdots & 1  	\\
+\end{pmatrix}
+\begin{pmatrix}
+1 		& 	0 		& 	0 		 \\
+\vdots	&	\vdots	& 	\vdots	 \\
+1 		& 	0 		& 	0 	     \\
+1 		& 	0 		& 	1 	 	 \\
+\vdots	&	\vdots	& 	\vdots	 \\
+1 		& 	0 		& 	1 		 \\
+1 		& 	1		& 	0 		 \\
+\vdots	&	\vdots	& 	\vdots 	 \\
+1 		& 	1 		& 	0 		 \\
+1 		& 	1 		& 	1 		 \\
+\vdots	&	\vdots	& 	\vdots	 \\
+1 		& 	1 		& 	1 		 \\
+\end{pmatrix}
+\\
+&
+=
+n_{ij}
+\begin{pmatrix*}[r]
+4 & 2 & 2 \\
+2 & 2 & 1 \\
+2 & 1 & 2 \\
+\end{pmatrix*}
+\end{split}
+\end{align}
+
+
+# Modellschätzung
+\footnotesize
+\vspace{1mm}
+\underline{Beweis (fortgeführt)}
+
+Ohne Beweis halten wir weiterhin fest, dass
+
+\begin{align}
+(X^T X)^{-1}
+=
+n_{ij}
+\begin{pmatrix*}[r]
+4 & 2 & 2 \\
+2 & 2 & 1 \\
+2 & 1 & 2\\
+\end{pmatrix*}^{-1}
+=
+\frac{1}{n_{ij}}
+\begin{pmatrix*}[r]
+ \frac{3}{4} & -\frac{1}{2} & -\frac{1}{2} \\
+-\frac{1}{2} & 1            & 0            \\
+-\frac{1}{2} & 0            & 1            \\
+\end{pmatrix*}
+\end{align}
+
+Es ergibt sich also
+\begin{equation}
+\hat{\beta}
+=
+\begin{pmatrix}
+\hat{\mu}_0      \\
+\hat{\alpha}_2   \\
+\hat{\beta}_2    \\
+\end{pmatrix}
+=
+\frac{1}{n_{ij}}
+\begin{pmatrix*}[r]
+ \frac{3}{4} & -\frac{1}{2} & -\frac{1}{2} \\
+-\frac{1}{2} & 1            & 0            \\
+-\frac{1}{2} & 0            & 1            \\
+\end{pmatrix*}
+\begin{pmatrix*}[l]
+\sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk} 	\\
+\sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}               	\\
+\sum_{i=1}^2 \sum_{k = 1}^{n_{i2}} y_{i2k} 	                \\
+\end{pmatrix*}.
+\end{equation}
+
+# Modellschätzung
+\footnotesize
+\underline{Beweis (fortgeführt)}
+
+Damit ergibt sich dann
+\tiny
+\begin{align}
+\begin{split}
+\hat{\mu}_0
+& =
+\frac{1}{n_{ij}}
+\left(
+  \frac{3}{4}\sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk}
+- \frac{1}{2}\sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}
+- \frac{1}{2}\sum_{i=1}^2 \sum_{k = 1}^{n_{i2}} y_{i2k}
+\right)
+\\
+& =
+\frac{1}{n_{ij}}
+\left(
+  \frac{3}{4}\sum_{k = 1}^{n_{11}} y_{11k}
++ \frac{3}{4}\sum_{k = 1}^{n_{12}} y_{12k}
++ \frac{3}{4}\sum_{k = 1}^{n_{21}} y_{21k}
++ \frac{3}{4}\sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+&
++ \frac{1}{n_{ij}}
+\left(
+- \frac{1}{2}\sum_{k = 1}^{n_{21}} y_{21k} - \frac{1}{2}\sum_{k = 1}^{n_{22}} y_{22k}
+- \frac{1}{2}\sum_{k = 1}^{n_{12}} y_{12k} - \frac{1}{2}\sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& = \frac{1}{n_{ij}}
+\left(
+  \frac{3}{4}\sum_{k = 1}^{n_{11}} y_{11k}
++ \frac{1}{4}\sum_{k = 1}^{n_{12}} y_{12k}
++ \frac{1}{4}\sum_{k = 1}^{n_{21}} y_{21k}
+- \frac{1}{4}\sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& =
+  \frac{3}{4}\bar{y}_{11}
++ \frac{1}{4}(\bar{y}_{12} + \bar{y}_{21})
+- \frac{1}{4}\bar{y}_{22}
+\end{split}
+\end{align}
+
+# Modellschätzung
+\footnotesize
+\underline{Beweis (fortgeführt)}
+
+sowie
+\tiny
+\begin{align}
+\begin{split}
+\hat{\alpha}_2
+& =
+\frac{1}{n_{ij}}
+\left(
+- \frac{1}{2} \sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk} + \sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}
+\right)
+\\
+& =
+\frac{1}{n_{ij}}
+\left(
+- \frac{1}{2}\sum_{k = 1}^{n_{11}} y_{11k}
+- \frac{1}{2}\sum_{k = 1}^{n_{12}} y_{12k}
+- \frac{1}{2}\sum_{k = 1}^{n_{21}} y_{21k}
+- \frac{1}{2}\sum_{k = 1}^{n_{22}} y_{22k}
++            \sum_{k = 1}^{n_{21}} y_{21k}
++            \sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& =
+\frac{1}{n_{ij}}
+\left(
+- \frac{1}{2}\sum_{k = 1}^{n_{11}} y_{11k}
+- \frac{1}{2}\sum_{k = 1}^{n_{12}} y_{12k}
++ \frac{1}{2}\sum_{k = 1}^{n_{21}} y_{21k}
++ \frac{1}{2}\sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& = \frac{1}{2}(\bar{y}_{21} + \bar{y}_{22}) - \frac{1}{2}(\bar{y}_{11} + \bar{y}_{12})
+\end{split}
+\end{align}
+\footnotesize
+und analog für $\hat{\beta}_2$.
+
+
+
+
+# Modellschätzung
+\vspace{2mm}
+\textcolor{darkblue}{Beispiel}
+\tiny
+\vspace{1mm}
+\setstretch{.6}
+```{r}
+# Datenreformatierung
+fname      = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D          = read.table(fname, sep = ",", header = TRUE)     # Datensatz
+A1B1       = D$BDI[D$Therapy == "F2F" & D$Age == "YA" ]      # Face-to-face, younger adults
+A1B2       = D$BDI[D$Therapy == "F2F" & D$Age == "OA" ]      # Face-to-face, younger adults
+A2B1       = D$BDI[D$Therapy == "ONL" & D$Age == "YA" ]      # Online,       older   adults
+A2B2       = D$BDI[D$Therapy == "ONL" & D$Age == "OA" ]      # Online,       older   adults
+
+# Datenmatrix für Gruppenmittelwerte
+n_ij       = length(A1B1)                                    # Anzahl Datenpunkte pro Gruppe
+Y          = matrix(c(A1B1,A1B2,A2B1,A2B2), nrow = n_ij)     # Datenmatrix
+bar_y      = colMeans(Y)                                     # Zellenmittelwerte
+
+# Modellschätzung
+I          = 2                                               # Anzahl Level Faktor A (Therapie)
+J          = 2                                               # Anzahl Level Faktor B (Alter)
+n          = I*J*n_ij                                        # Anzahl Datenpunkte
+p          = 1 + (I-1)+(J-1)+(I*J-3)                         # Anzahl Parameter
+D          = matrix(c(1,0,0,                                 # Prototypische Designmatrix für balancierte Designs
+                      1,0,1,
+                      1,1,0,
+                      1,1,1), nrow = p, byrow = TRUE)
+C          = matrix(rep(1,n_ij),nrow = n_ij)                 # Prototypischer Zellenvektor für balancierte Designs
+X          = kronecker(D,C)                                  # Kroneckerprodukt Designmatrix
+y          = matrix(c(A1B1,A1B2,A2B1,A2B2), nrow = n)        # Datenvektor
+beta_hat   = solve(t(X) %*% X) %*% t(X) %*% y                # Betaparameterschätzer
+eps_hat    = y - X %*% beta_hat                              # Residuenvektor
+sigsqr_hat = (t(eps_hat) %*% eps_hat) /(n-p)                 # Varianzparameterschätzer
+cat("hat{beta}                            : "   , beta_hat,  # Ausgabe
+    "\nhat{sigsqr}                          : " , sigsqr_hat,
+    "\ny_11,y_12,y_21,y_22                  : " , bar_y,
+    "\n3/4y_11 + 1/4(y_12 + y_21) - 1/4y_22 : " , (3/4)*bar_y[1]+(1/4)*(bar_y[2]+bar_y[3])-(1/4)*bar_y[4],
+    "\n1/2(y_21 + y_22) - 1/2(y_11 + y_12)  : " , (1/2)*(bar_y[3]+bar_y[4])-(1/2)*(bar_y[1] + bar_y[2]),
+    "\n1/2(y_12 + y_22) - 1/2(y_11 + y_21)  : " , (1/2)*(bar_y[2]+bar_y[4])-(1/2)*(bar_y[1] + bar_y[3]))
+
+```
+
+# Modellschätzung
+\footnotesize
+\begin{theorem}[\begin{small} Betaparameterschätzung im 2 x 2 ZVA Modell mit Interaktion und Referenzgruppe \end{small}]
+\justifying
+\normalfont
+Gegeben sei die Designmatrixform eines balancierten 2 x 2 ZVA Modells mit
+Interaktion und Referenzgruppe. Dann ergibt sich für den Betaparameterschätzer
+\begin{equation}
+\hat{\beta} :=
+\begin{pmatrix}
+\hat{\mu}_0       \\
+\hat{\alpha}_2    \\
+\hat{\beta}_2     \\
+\hat{\gamma}_{22} \\
+\end{pmatrix}
+=
+\begin{pmatrix}
+\bar{y}_{11} \\
+\bar{y}_{21} - \bar{y}_{11} \\
+\bar{y}_{12} - \bar{y}_{11} \\
+\bar{y}_{11} + \bar{y}_{22} - \bar{y}_{12} - \bar{y}_{21}  \\
+\end{pmatrix},
+\end{equation}
+wobei
+\begin{equation}
+\bar{y}_{ij} := \frac{1}{n_{ij}}\sum_{k = 1}^{n_{ij}} y_{ijk} \mbox{ für } 1 \le i,j \le 2
+\end{equation}
+das Stichprobenmittel der $i,j$ten Gruppe des 2 x 2 ZVA Designs bezeichnet.
+\end{theorem}
+
+\footnotesize
+\underline{Beweis}
+
+Wir bestimmen zunächst $X^Ty, X^TX$ und $(X^TX)^{-1}$ bei konstantem $n_{ij}$ für $1 \le i,j \le 2$.
+
+# Modellschätzung
+\footnotesize
+\vspace{1mm}
+\underline{Beweis (fortgeführt)}
+
+\tiny
+\begin{align}
+\renewcommand{\arraystretch}{1.2}
+\begin{split}
+X^Ty
+& =
+\setcounter{MaxMatrixCols}{20}
+\begin{pmatrix}
+1 & \cdots & 1 & 1 & \cdots & 1 & 1 & \cdots & 1 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 0 & \cdots & 0 & 1 & \cdots & 1 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 1 & \cdots & 1 & 0 & \cdots & 0 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 0 & \cdots & 0 & 0 & \cdots & 0 & 1 & \cdots & 1  	\\
+\end{pmatrix}
+\begin{pmatrix*}[l]
+y_{111} 	\\ 	\vdots 	\\ y_{11n_{11}}
+\\
+y_{121} 	\\ 	\vdots 	\\ y_{12n_{12}}
+\\
+y_{211} 	\\ 	\vdots 	\\ y_{21n_{21}}
+\\
+y_{221} 	\\ 	\vdots 	\\ y_{22n_{22}}
+\end{pmatrix*}
+\\
+& =
+\begin{pmatrix*}[l]
+\sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk} 	\\
+\sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}               	\\
+\sum_{i=1}^2 \sum_{k = 1}^{n_{i2}} y_{i2k} 	                \\
+\sum_{k = 1}^{n_{22}} y_{22k}                             	\\
+\end{pmatrix*}.
+\end{split}
+\end{align}
+
+# Modellschätzung
+\footnotesize
+\vspace{1mm}
+\underline{Beweis (fortgeführt)}
+
+
+\tiny
+\begin{align}
+\renewcommand{\arraystretch}{1}
+\begin{split}
+X^TX
+& =
+\setcounter{MaxMatrixCols}{20}
+\begin{pmatrix}
+1 & \cdots & 1 & 1 & \cdots & 1 & 1 & \cdots & 1 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 0 & \cdots & 0 & 1 & \cdots & 1 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 1 & \cdots & 1 & 0 & \cdots & 0 & 1 & \cdots & 1  	\\
+0 & \cdots & 0 & 0 & \cdots & 0 & 0 & \cdots & 0 & 1 & \cdots & 1  	\\
+\end{pmatrix}
+\begin{pmatrix}
+1 		& 	0 		& 	0 		 & 	0	    \\
+\vdots	&	\vdots	& 	\vdots	 & 	\vdots	\\
+1 		& 	0 		& 	0 		 & 	0	    \\
+1 		& 	0 		& 	1 	 	 & 	0       \\
+\vdots	&	\vdots	& 	\vdots	 & 	\vdots	\\
+1 		& 	0 		& 	1 		 & 	0	    \\
+1 		& 	1		& 	0 		 & 	0	    \\
+\vdots	&	\vdots	& 	\vdots 	 & 	\vdots  \\
+1 		& 	1 		& 	0 		 & 	0    	\\
+1 		& 	1 		& 	1 		 & 	1     	\\
+\vdots	&	\vdots	& 	\vdots	 & 	\vdots	\\
+1 		& 	1 		& 	1 		 & 	1	    \\
+\end{pmatrix}
+\\
+&
+=
+n_{ij}
+\begin{pmatrix*}[r]
+4 & 2 & 2 & 1 \\
+2 & 2 & 1 & 1 \\
+2 & 1 & 2 & 1 \\
+1 & 1 & 1 & 1
+\end{pmatrix*}
+\end{split}
+\end{align}
+
+# Modellschätzung
+\footnotesize
+\vspace{1mm}
+\underline{Beweis (fortgeführt)}
+
+Ohne Beweis halten wir weiterhin fest, dass
+
+\begin{align}
+(X^T X)^{-1}
+=
+n_{ij}
+\begin{pmatrix*}[r]
+4 & 2 & 2 & 1 \\
+2 & 2 & 1 & 1 \\
+2 & 1 & 2 & 1 \\
+1 & 1 & 1 & 1
+\end{pmatrix*}^{-1}
+=
+\frac{1}{n_{ij}}
+\begin{pmatrix*}[r]
+ 1 & -1 & -1 &  1 \\
+-1 &  2 &  1 & -2 \\
+-1 &  1 &  2 & -2 \\
+ 1 & -2 & -2 &  4 \\
+\end{pmatrix*}.
+\end{align}
+Es ergibt sich also
+\begin{equation}
+\hat{\beta}
+=
+\begin{pmatrix}
+\hat{\mu}_0      \\
+\hat{\alpha}_2   \\
+\hat{\beta}_2    \\
+\hat{\gamma}_{22} \\
+\end{pmatrix}
+=
+\frac{1}{n_{ij}}
+\begin{pmatrix*}[r]
+ 1 & -1 & -1 &  1 \\
+-1 &  2 &  1 & -2 \\
+-1 &  1 &  2 & -2 \\
+ 1 & -2 & -2 &  4 \\
+\end{pmatrix*}
+\begin{pmatrix*}[l]
+\sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk} 	\\
+\sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}               	\\
+\sum_{i=1}^2 \sum_{k = 1}^{n_{i2}} y_{i2k} 	                \\
+\sum_{k = 1}^{n_{22}} y_{22k}                             	\\
+\end{pmatrix*}.
+\end{equation}
+
+
+# Modellschätzung
+\footnotesize
+\underline{Beweis (fortgeführt)}
+
+Damit ergibt sich dann
+\tiny
+\begin{align}
+\begin{split}
+\hat{\mu}_0
+& =
+\frac{1}{n_{ij}}
+\left(
+  \sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk}
+- \sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}
+- \sum_{i=1}^2 \sum_{k = 1}^{n_{i2}} y_{i2k}
++ \sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& =
+\frac{1}{n_{ij}}
+\left(\sum_{k = 1}^{n_{11}} y_{11k} + \sum_{k = 1}^{n_{12}} y_{12k} + \sum_{k = 1}^{n_{21}} y_{21k} + \sum_{k = 1}^{n_{22}} y_{22k}\right)
+\\
+&
++ \frac{1}{n_{ij}}
+\left(
+  - \sum_{k = 1}^{n_{21}} y_{21k} - \sum_{k = 1}^{n_{22}} y_{22k}
+  - \sum_{k = 1}^{n_{12}} y_{12k} - \sum_{k = 1}^{n_{22}} y_{22k}
+  + \sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& = \frac{1}{n_{11}} \sum_{k = 1}^{n_{11}} y_{11k}
+\\
+& = \bar{y}_{11}
+\end{split}
+\end{align}
+
+# Modellschätzung
+\footnotesize
+\underline{Beweis (fortgeführt)}
+
+sowie
+\tiny
+\begin{align}
+\begin{split}
+\hat{\alpha}_2
+& =
+\frac{1}{n_{ij}}
+\left(
+-  \sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk}
++ 2\sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}
++ 1\sum_{i=1}^2 \sum_{k = 1}^{n_{i2}} y_{i2k}
+- 2 \sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& =
+\frac{1}{n_{ij}}
+\left(
+-\sum_{k = 1}^{n_{11}} y_{11k} - \sum_{k = 1}^{n_{12}} y_{12k} - \sum_{k = 1}^{n_{21}} y_{21k} - \sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+&
++ \frac{1}{n_{ij}}
+\left(
+  2\sum_{k = 1}^{n_{21}} y_{21k} +2\sum_{k = 1}^{n_{22}} y_{22k}
++  \sum_{k = 1}^{n_{12}} y_{12k} + \sum_{k = 1}^{n_{22}} y_{22k}
+- 2\sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+&
+= \frac{1}{n_{ij}}\left(\sum_{k = 1}^{n_{21}} y_{21k} - \sum_{k = 1}^{n_{11}} y_{11k}\right)
+\\
+&
+= \bar{y}_{21} - \bar{y}_{11}
+\end{split}
+\end{align}
+\footnotesize
+und analog für $\hat{\beta}_2$.
+
+# Modellschätzung
+\footnotesize
+\underline{Beweis (fortgeführt)}
+
+Schließlich ergibt sich
+\tiny
+\begin{align}
+\begin{split}
+\hat{\gamma}_{22}
+& =
+\frac{1}{n_{ij}}
+\left(
+   \sum_{i=1}^2 \sum_{j=1}^2 \sum_{k = 1}^{n_{ij}} y_{ijk}
+- 2\sum_{j=1}^2 \sum_{k = 1}^{n_{2j}} y_{2jk}
+- 2\sum_{i=1}^2 \sum_{k = 1}^{n_{i2}} y_{i2k}
++ 4 \sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& =
+\frac{1}{n_{ij}}
+\left(\sum_{k = 1}^{n_{11}} y_{11k} + \sum_{k = 1}^{n_{12}} y_{12k} + \sum_{k = 1}^{n_{21}} y_{21k} + \sum_{k = 1}^{n_{22}} y_{22k}\right)
+\\
+&
++ \frac{1}{n_{ij}}
+\left(
+  - 2\sum_{k = 1}^{n_{21}} y_{21k} - 2\sum_{k = 1}^{n_{22}} y_{22k}
+  - 2\sum_{k = 1}^{n_{12}} y_{12k} - 2\sum_{k = 1}^{n_{22}} y_{22k}
+  + 4\sum_{k = 1}^{n_{22}} y_{22k}
+\right)
+\\
+& =
+\frac{1}{n_{ij}}
+\left(
+  \sum_{k = 1}^{n_{11}} y_{11k}
++ \sum_{k = 1}^{n_{22}} y_{22k}
+- \sum_{k = 1}^{n_{12}} y_{12k}
+- \sum_{k = 1}^{n_{21}} y_{21k}
+\right)
+\\
+& = \bar{y}_{11} + \bar{y}_{22} - \bar{y}_{12} - \bar{y}_{21}.
+\end{split}
+\end{align}
+
+
+# Modellschätzung
+\vspace{2mm}
+\textcolor{darkblue}{Beispiel}
+\tiny
+\vspace{1mm}
+\setstretch{.6}
+```{r}
+# Datenreformatierung
+fname      = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D          = read.table(fname, sep = ",", header = TRUE)     # Datensatz
+A1B1       = D$BDI[D$Therapy == "F2F" & D$Age == "YA" ]      # Face-to-face, younger adults
+A1B2       = D$BDI[D$Therapy == "F2F" & D$Age == "OA" ]      # Face-to-face, younger adults
+A2B1       = D$BDI[D$Therapy == "ONL" & D$Age == "YA" ]      # Online,       older   adults
+A2B2       = D$BDI[D$Therapy == "ONL" & D$Age == "OA" ]      # Online,       older   adults
+
+# Datenmatrix für Gruppenmittelwerte
+n_ij       = length(A1B1)                                    # Anzahl Datenpunkte pro Gruppe
+Y          = matrix(c(A1B1,A1B2,A2B1,A2B2), nrow = n_ij)     # Datenmatrix
+bar_y      = colMeans(Y)                                     # Zellenmittelwerte
+
+# Modellschätzung
+I          = 2                                               # Anzahl Level Faktor A (Therapie)
+J          = 2                                               # Anzahl Level Faktor B (Alter)
+n          = I*J*n_ij                                        # Anzahl Datenpunkte
+p          = 1 + (I-1)+(J-1)+(I*J-3)                         # Anzahl Parameter
+D          = matrix(c(1,0,0,0,                               # Prototypische Designmatrix für balancierte Designs
+                      1,0,1,0,
+                      1,1,0,0,
+                      1,1,1,1), nrow = p, byrow = TRUE)
+C          = matrix(rep(1,n_ij),nrow = n_ij)                 # Prototypischer Zellenvektor für balancierte Designs
+X          = kronecker(D,C)                                  # Kroneckerprodukt Designmatrix
+y          = matrix(c(A1B1,A1B2,A2B1,A2B2), nrow = n)        # Datenvektor
+beta_hat   = solve(t(X) %*% X) %*% t(X) %*% y                # Betaparameterschätzer
+eps_hat    = y - X %*% beta_hat                              # Residuenvektor
+sigsqr_hat = (t(eps_hat) %*% eps_hat) /(n-p)                 # Varianzparameterschätzer
+cat("hat{beta}                 : "   , beta_hat,             # Ausgabe
+    "\nhat{sigsqr}               : " , sigsqr_hat,
+    "\ny_11,y_12,y_21,y_22       : " , bar_y,
+    "\ny_11                      : " , bar_y[1],
+    "\ny_21 - y_11               : " , bar_y[3]-bar_y[1],
+    "\ny_12 - y_11               : " , bar_y[2]-bar_y[1],
+    "\ny_11 + y_22 - y_12 + y_21 : " , bar_y[1]+bar_y[4]-bar_y[3]-bar_y[2])
+```
+
+#
+\large
+\setstretch{2.7}
+\vfill
+Anwendungsszenario
+
+Modellformulierung
+
+Modellschätzung
+
+**Modellevaluation**
+
+Selbstkontrollfragen
+\vfill
+
+# Modellevaluation
+\textcolor{darkblue}{Überblick}
+
+\small
+Wie bei der EVA kann auch bei der ZVA eine Modellevaluationstheorie mithilfe 
+einer Quadratsummenzerlegung entwickelt werden (vgl. Inferenzstatistik SoSe 2021).
+Mit zunehmender Designkomplexität wird eine solche Theorie allerdings zunehmend unübersichtlich.
+Prinzipiell können alle Quadratsummenzerlegung-basierten F-Statistiken auf 
+Likelihood-basierte Modellvergleich zurückgeführt werden. Allerdings fehlt dazu 
+in diesem Kurs bisher eine allgemeine Kontrasttheorie. Wir beschränken
+und im Folgenden aufgrund dieser Tatsachen deshalb auf die
+
+(1) Evaluation der Haupteffekte  im additiven Modell der 2 x 2 ZVA mit Referenzgruppe und die
+(2) Evaluation der Interaktion im Modell der 2 x 2 ZVA mit Interaktion und Referenzgruppe
+
+Zukünftige Iterationen dieses Kurses werden eine allgemeine Kontrasttheorie und 
+ihren Bezug zu Quadratsummenzerlegungen und Modellvergleichen beinhalten, siehe 
+dazu zum Beispiel Poline (2012) Neuroimage 15;62(2):871-80 und  Christensen (2011) 
+Plane Answers to Complex Questions: The Theory of General Linear Models.
+
+# Modellevaluation
+\setstretch{2.1}
+
+\textcolor{darkblue}{Evaluation der Haupteffekte  im additiven Modell der 2 x 2 ZVA mit Referenzgruppe}
+
+(1) Statistische Modelle und Teststatistiken
+
+(2) Testhypothesen und Tests
+
+(3) Testumfangkontrollen und p-Werte
+
+\textcolor{darkblue}{Evaluation der Interaktion im Modell der 2 x 2 ZVA mit Interaktion und Referenzgruppe}
+
+(1) Statistisches Modell und Teststatistik
+
+(2) Testhypothese und Test
+
+(3) Testumfangkontrolle und p-Wert
+
+# \small Modellevaluation | Haupteffekte im additiven Modell der 2 x 2 ZVA mit Referenzgruppe
+\vspace{1mm}
+\footnotesize
+\begin{theorem}[Teststatistiken für Haupteffekte]
+\justifying
+\normalfont
+Es sei
+\begin{equation}
+y = X\beta + \varepsilon \mbox{ mit } \varepsilon \sim N(0_n,\sigma^2I_n)
+\end{equation}
+die Designmatrixform des additiven Modells der 2 x 2 ZVA mit Referenzgruppe, wobei die $n \times 1$ Spalten von $X$ bezeichnet
+seien durch
+\begin{equation}
+X := \begin{pmatrix} X_{\mu_0} & X_{\alpha_2} & X_{\beta_2} \end{pmatrix} \in \mathbb{R}^{n \times 3}
+\end{equation}
+Dann gelten
+\begin{itemize}
+\item[(A)] Eine \textit{F-Teststatistik für den Haupteffekt von Faktor A} ist die F-Statistik
+des ALMs mit
+\begin{equation}
+X_A     := \begin{pmatrix} X_{\mu_0} &   X_{\beta_2} & X_{\alpha_2} \end{pmatrix} \in \mathbb{R}^{n \times 3},
+\beta_A := \begin{pmatrix} \mu_0 \\ \beta_2 \\ \alpha_2 \end{pmatrix} \in \mathbb{R}^3
+\mbox{ und } p_1 := 2, p_2 := 1.
+\end{equation}
+\item[(B)] Eine \textit{F-Teststatistik für den Haupteffekt von Faktor B} ist die F-Statistik des ALMs mit
+\begin{equation}
+X_B    := \begin{pmatrix} X_{\mu_0} & X_{\alpha_2} & X_{\beta_2} \end{pmatrix} \in \mathbb{R}^{n \times 3},
+\beta_B := \begin{pmatrix} \mu_0 \\ \alpha_2 \\ \beta_2 \end{pmatrix} \in \mathbb{R}^3
+\mbox{ und } p_1 := 2, p_2 := 1.
+\end{equation}
+\end{itemize}
+\end{theorem}
+
+# \small Modellevaluation | Haupteffekte im additiven Modell der 2 x 2 ZVA mit Referenzgruppe
+\footnotesize
+\begin{definition}[Testhypothesen und Tests]
+\justifying
+Gegeben sei das Modell der additiven 2 x 2 ZVA und die F-Teststatistiken
+für die Haupteffekte von Faktor A und B seien mit $F_A, F_B$ und $F_{A \times B}$
+bezeichnet und wie oben definiert. Dann gelten folgende Definitionen:
+\begin{itemize}
+\item[(A)] Der kritische Wert-basierte Test
+\begin{equation}
+\phi_A(y) := 1_{\{F_A \ge k\}} \mbox{ mit Nullhypothese } H_0^A : \alpha_2 = 0
+\end{equation}
+definiert den \textit{F-Test des Haupteffekts von Faktor A} im Modell mit $X_A, \beta_A$.
+\item[(B)] Der kritische Wert-basierte Test
+\begin{equation}
+\phi_B(y) := 1_{\{F_B \ge k\}} \mbox{ mit Nullhypothese } H_0^B : \beta_2 = 0
+\end{equation}
+definiert den \textit{F-Test des Haupteffekts von Faktor B} im Modell mit $X_B, \beta_B$.
+\end{itemize}
+\end{definition}
+
+# \small Modellevaluation | Haupteffekte im additiven Modell der 2 x 2 ZVA mit Referenzgruppe
+\footnotesize
+\begin{theorem}[Testumfangkontrolle und p-Werte]
+\justifying
+\normalfont
+Mit obigen Definition und der KVF $\varphi$ der $f$-Verteilung gelten:
+\begin{itemize}
+\item[(A)] $\phi_A$ ist ein Level-$\alpha_0$-Test mit Testumfang $\alpha_0$, wenn der
+kritische Wert ist definiert durch
+\begin{equation}
+k_{\alpha_0}^A := \varphi^{-1}(1-\alpha_0; 1,n-3)
+\end{equation}
+und der zu einem beobachteten Wert $f_A$ von $F_A$ assoziierte p-Wert ist gegeben durch
+\begin{equation}
+\mbox{p}_A\mbox{-Wert} := 1 - \varphi(1-\alpha_0; 1,n-3).
+\end{equation}
+\item[(B)] $\phi_B$ ist ein Level-$\alpha_0$-Test mit Testumfang $\alpha_0$, wenn der
+kritische Wert ist definiert durch
+\begin{equation}
+k_{\alpha_0}^B := \varphi^{-1}(1-\alpha_0; 1,n-3)
+\end{equation}
+und der zu einem beobachteten Wert $f_B$ von $F_B$ assoziierte p-Wert ist gegeben durch
+\begin{equation}
+\mbox{p}_B\mbox{-Wert} := 1 - \varphi(1-\alpha_0; 1,n-3).
+\end{equation}
+\end{itemize}
+\end{theorem}
+Bemerkung
+
+* Wir verzichten auf einen Beweis.
+
+# \small Modellevaluation | Haupteffekte im additiven Modell der 2 x 2 ZVA mit Referenzgruppe
+\vspace{3mm}
+\setstretch{.5}
+\tiny
+
+```{r, echo = F}
+# Datenreformatierung
+fname     = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D         = read.table(fname, sep = ",", header = TRUE)  # Datensatz
+A1B1      = D$BDI[D$Therapy == "F2F" & D$Age == "YA" ]   # Face-to-face, younger adults
+A1B2      = D$BDI[D$Therapy == "F2F" & D$Age == "OA" ]   # Face-to-face, younger adults
+A2B1      = D$BDI[D$Therapy == "ONL" & D$Age == "YA" ]   # Online,       older   adults
+A2B2      = D$BDI[D$Therapy == "ONL" & D$Age == "OA" ]   # Online,       older   adults
+```
+
+```{r}
+# Modellevaluation
+I          = 2                                           # Anzahl Level Faktor A (Therapie)
+J          = 2                                           # Anzahl Level Faktor B (Alter)
+n_ij       = length(A1B1)                                # balanciertes ANOVA Design
+n          = I*J*n_ij                                    # Anzahl Datenpunkte
+p          = 3                                           # Anzahl Parameter vollständiges Modell
+y          = matrix(c(A1B1,A1B2,A2B1,A2B2), nrow = n)    # Datenvektor
+D          = matrix(c(1,0,0,1,0,1,1,1,0,1,1,1),          # Prototypische Designmatrix
+                     nrow = I*J,byrow=TRUE)
+C          = matrix(rep(1,n_ij),nrow = n_ij)             # Prototypischer Zellenvektor für balancierte Designs
+X          = kronecker(D,C)                              # ZVA Kroneckerprodukt Designmatrix
+XH         = list(X[,c(1,3,2)], X)                       # Modellvarianten
+alpha_0    = 0.05                                        # Signifikanzlevel
+Eff        = rep(NaN,2)                                  # F-Teststatistik Arrayinitialisierung
+k_alpha_0  = rep(NaN,2)                                  # Kritischer Wert Arrayinitialisierung
+phi        = rep(NaN,2)                                  # Testwert Arrayinitialisierung
+p_vals     = rep(NaN,2)                                  # p-Wert Arrayinitialisierung
+for(i in 1:2){                                           # Iteration über Modellvarianten
+    X            = XH[[i]]                               # Designmatrix vollständiges Modell
+    X_1          = X[,-3]                                # Designmatrix reduziertes Modell
+    p            = ncol(X)                               # Anzahl Parameter vollständiges Modell
+    p_1          = ncol(X_1)                             # Anzahl Parameter reduziertes Modell
+    p_2          = p - p_1                               # Anzahl zusätzlicher Parameter im vollst. Modell
+    beta_hat_1   = solve(t(X_1)%*%X_1)%*%t(X_1)%*%y      # Betaparameterschätzer reduziertes Modell
+    beta_hat     = solve(t(X) %*%X )%*%t(X) %*%y         # Betaparameterschätzer vollständiges Modell
+    eps_hat_1    = y-X_1%*%beta_hat_1                    # Residuenvektor reduziertes Modell
+    eps_hat      = y - X%*%beta_hat                      # Residuenvektor vollständiges Modell
+    eh1_eh1      = t(eps_hat_1) %*% eps_hat_1            # RQS reduziertes Modell
+    eh_eh        = t(eps_hat) %*% eps_hat                # RQS vollständiges Modell
+    sigsqr_hat   = eh_eh/(n-p)                           # Varianzparameterschätzer vollst. Modell
+    Eff[i]       = ((eh1_eh1-eh_eh)/p_2)/sigsqr_hat      # F-Statistik
+    k_alpha_0[i] = qf(1-alpha_0, p_2, n-p)               # kritischer Wert
+    if(Eff[i] >= k_alpha_0[i]){ phi[i] = 1 }             # H_0 Ablehnen
+    else {                      phi[i] = 0 }             # H_A Annehmen
+    p_vals[i]    = 1 - pf(Eff[i], p_2,n-p)               # p-Wert
+}
+data.frame("f"= Eff,"k" = k_alpha_0,"phi"= phi, "p-Wert" = p_vals, row.names = c("Therapy", "Age"))
+```
+
+# \small Modellevaluation | Haupteffekte im additiven Modell der 2 x 2 ZVA mit Referenzgruppe
+\small
+\textcolor{darkblue}{Haupteffekte der additiven 2 x 2 ZVA mit R's aov() Funktion}
+\tiny
+\setstretch{.8}
+\vspace{1mm}
+
+```{r}
+# Dateneinlesen
+fname      = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D          = read.table(fname, sep = ",", header = TRUE)
+
+# R's aov Funktion
+res.aov    = aov(BDI ~ Therapy + Age, data = D)                # Modellformulierung und Modellschätzung
+summary(res.aov)                                               # Modellevaluation
+```
+
+\vspace{2mm}
+
+\small
+\textcolor{darkblue}{Haupteffekte der additiven 2 x 2 ZVA mit R's lm() und anova() Funktionen}
+\tiny
+\setstretch{.8}
+\vspace{1mm}
+```{r}
+# Dateneinlesen
+fname      = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D          = read.table(fname, sep = ",", header = TRUE)
+
+# R's lm (linear model) und anova() Funktionen
+glm        = lm(BDI ~ Therapy + Age, data = D)                # Modellformulierung und Modellschätzung
+anova(glm)                                                    # Modellevaluation
+```
+
+# Modellevaluation
+\setstretch{2.1}
+
+\textcolor{darkblue}{Evaluation der Haupteffekte  im additiven Modell der 2 x 2 ZVA mit Referenzgruppe}
+
+(1) Statistische Modelle und Teststatistiken
+
+(2) Testhypothesen und Tests
+
+(3) Testumfangkontrollen und p-Werte
+
+\textcolor{darkblue}{Evaluation der Interaktion im Modell der 2 x 2 ZVA mit Interaktion und Referenzgruppe}
+
+(1) Statistisches Modell und Teststatistik
+
+(2) Testhypothe und Test
+
+(3) Testumfangkontrolle und p-Wert
+
+# \small Modellevaluation | Interaktion im Modell der 2 x 2 ZVA mit Interaktion und Referenzgruppe
+\vspace{2mm}
+\footnotesize
+\begin{theorem}[Teststatistik für die Interaktion]
+\justifying
+\normalfont
+Es sei
+\begin{equation}
+y = X\beta + \varepsilon \mbox{ mit } \varepsilon \sim N(0_n,\sigma^2I_n)
+\end{equation}
+die Designmatrixform des 2 x 2 ZVA Modells mit Interaktion und Referenzgruppe. 
+Dann ist die F-Statistik mit $p_1 := 3$ und $p_2 := 1$ eine F-Teststatistik für
+die Interaktion von Faktor A und Faktor B.
+\end{theorem}
+\begin{definition}[Testhypothese und Test]
+\justifying
+Die F-Teststatistik für die Interaktion von Faktor A und Faktor B sei mit $F_{A \times B}$
+bezeichnet und wie oben definiert. Dann definiert der kritische Wert-basierte Test
+\begin{equation}
+\phi_{A\times B}(y) := 1_{\{F_{A \times B} \ge k\}} \mbox{ mit Nullhypothese } H_0^{A\times B} : \gamma_{22} = 0
+\end{equation}
+den \textit{F-Test der Interaktion von Faktor A und Faktor B}.
+\end{definition}
+\begin{theorem}[Testumfangkontrolle und p-Wert]
+\justifying
+\normalfont
+Mit obigen Definition und der KVF $\varphi$ der $f$-Verteilung gilt, dass
+$\phi_{A\times B}$ ist ein Level-$\alpha_0$-Test mit Testumfang $\alpha_0$ ist, 
+wenn der kritische Wert ist definiert durch
+\begin{equation}
+k_{\alpha_0}^{A \times B} := \varphi^{-1}(1-\alpha_0; 1,n-4)
+\end{equation}
+und der zu einem beobachteten Wert $f_{A \times B}$ von $F_{A \times B}$ 
+assoziierte p-Wert ist gegeben durch
+\begin{equation}
+\mbox{p}_{A \times B}\mbox{-Wert} := 1 - \varphi(1-\alpha_0; 1,n-4).
+\end{equation}
+\end{theorem}
+
+# \small Modellevaluation | Interaktion im Modell der 2 x 2 ZVA mit Interaktion und Referenzgruppe
+\vspace{3mm}
+\setstretch{.5}
+\tiny
+
+```{r, echo = F}
+# Datenreformatierung
+fname     = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D         = read.table(fname, sep = ",", header = TRUE)  # Datensatz
+A1B1      = D$BDI[D$Therapy == "F2F" & D$Age == "YA" ]   # Face-to-face, younger adults
+A1B2      = D$BDI[D$Therapy == "F2F" & D$Age == "OA" ]   # Face-to-face, younger adults
+A2B1      = D$BDI[D$Therapy == "ONL" & D$Age == "YA" ]   # Online,       older   adults
+A2B2      = D$BDI[D$Therapy == "ONL" & D$Age == "OA" ]   # Online,       older   adults
+```
+
+```{r}
+# Modellevaluation
+I          = 2                                           # Anzahl Level Faktor A (Therapie)
+J          = 2                                           # Anzahl Level Faktor B (Alter)
+n_ij       = length(A1B1)                                # balanciertes ANOVA Design
+n          = I*J*n_ij                                    # Anzahl Datenpunkte
+p          = 4                                           # Anzahl Parameter vollständiges Modell
+y          = matrix(c(A1B1,A1B2,A2B1,A2B2), nrow = n)    # Datenvektor
+D          = matrix(c(1,0,0,0,1,0,1,0, 1,1,0,0,1,1,1,1), # Prototypische Designmatrix
+                     nrow = I*J,byrow=TRUE)
+C          = matrix(rep(1,n_ij),nrow = n_ij)             # Prototypischer Zellenvektor für balancierte Designs
+X          = kronecker(D,C)                              # ZVA Kroneckerprodukt Designmatrix
+XH         = list(X[,c(1,3,2)], X)                       # Modellvarianten
+alpha_0    = 0.05                                        # Signifikanzlevel
+X          = XH[[i]]                                     # Designmatrix vollständiges Modell
+X_1        = X[,-4]                                      # Designmatrix reduziertes Modell
+p          = ncol(X)                                     # Anzahl Parameter vollständiges Modell
+p_1        = ncol(X_1)                                   # Anzahl Parameter reduziertes Modell
+p_2        = p - p_1                                     # Anzahl zusätzlicher Parameter im vollst. Modell
+beta_hat_1 = solve(t(X_1)%*%X_1)%*%t(X_1)%*%y            # Betaparameterschätzer reduziertes Modell
+beta_hat   = solve(t(X) %*%X )%*%t(X) %*%y               # Betaparameterschätzer vollständiges Modell
+eps_hat_1  = y-X_1%*%beta_hat_1                          # Residuenvektor reduziertes Modell
+eps_hat    = y - X%*%beta_hat                            # Residuenvektor vollständiges Modell
+eh1_eh1    = t(eps_hat_1) %*% eps_hat_1                  # RQS reduziertes Modell
+eh_eh      = t(eps_hat) %*% eps_hat                      # RQS vollständiges Modell
+sigsqr_hat = eh_eh/(n-p)                                 # Varianzparameterschätzer vollst. Modell
+f          = ((eh1_eh1-eh_eh)/p_2)/sigsqr_hat            # F-Statistik
+k_alpha_0  = qf(1-alpha_0, p_2, n-p)                     # kritischer Wert
+if(f >= k_alpha_0){phi = 1} else {phi = 0}               # Test
+p_val      = 1 - pf(f, p_2,n-p)                          # p-Wert
+data.frame("f"= f,"k" = k_alpha_0," phi"= phi, "p-Wert" = p_val, row.names = c("Therapy x Age"))
+```
+
+# \small Modellevaluation | Interaktion im Modell der 2 x 2 ZVA mit Interaktion und Referenzgruppe
+\small
+\textcolor{darkblue}{Interaktion im Modell der 2 x 2 ZVA mit Interaktion mit R's aov() Funktion}
+\tiny
+\setstretch{.8}
+\vspace{1mm}
+
+```{r}
+# Dateneinlesen
+fname      = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D          = read.table(fname, sep = ",", header = TRUE)
+
+# R's aov Funktion
+res.aov    = aov(BDI ~ Therapy + Age + Age:Therapy, data = D)  # Modellformulierung und Modellschätzung
+summary(res.aov)                                               # Modellevaluation
+``` 
+
+\vspace{2mm}
+
+\small
+\textcolor{darkblue}{Interaktion im Modell der 2 x 2 ZVA mit Interaktion mit R's lm() und anova() Funktionen}
+\tiny
+\setstretch{.8}
+\vspace{1mm}
+```{r}
+# Dateneinlesen
+fname      = file.path(getwd(), "11_Daten", "11_Zweifaktorielle_Varianzanalyse_Daten.csv")
+D          = read.table(fname, sep = ",", header = TRUE)
+
+# R's lm (linear model) und anova() Funktionen
+glm        = lm(BDI ~ Therapy + Age + Therapy:Age, data = D)   # Modellformulierung und Modellschätzung
+anova(glm)                                                     # Modellevaluation
+```
+
+#
+\large
+\setstretch{2.7}
+\vfill
+Anwendungsszenario
+
+Modellformulierung
+
+Modellschätzung
+
+Modellevaluation
+
+**Selbstkontrollfragen**
+\vfill
+
+# Selbstkontrollfragen
+\footnotesize
+\begin{enumerate}
+\justifying
+\item Erläutern Sie das Anwendungsszenario der zweifaktoriellen Varianzanalyse (ZVA).
+\item Aus wie vielen Datenpunkten besteht ein Datensatz eines 3 x 4 ZVA Designs mit 10 Datenpunkten pro Zelle? 
+\item Erläutern Sie die intuitive Bedeutung eines Haupteffektes in einem ZVA Design.
+\item Erläutern Sie die intuitive Bedeutung einer Interkation ein einem ZVA Design.
+\item Geben Sie die Definition des additiven Modells der ZVA mit Referenzgruppe (RG) wieder.
+\item Erläutern Sie die Bedeutung der Parameter $\mu_0,\alpha_2$ und $\beta_2$ im additiven Modell der ZVA mit RG.
+\item Bestimmen Sie $\mu_{ij}$ für $\mu_0 := 2,\alpha_2 = -1$ und $\beta_2 := 3$ im additiven Modell der ZVA mit RG.
+\item Geben Sie die Designmatrixform des Modells einer additiven 2 x 2 ZVA mit RG für $n_{ij} := 1$ an.
+\item Geben Sie die Designmatrixform des Modells einer additiven 2 x 2 ZVA mit RG für $n_{ij} := 3$ an.
+\item Geben Sie die Definition des Modells der ZVA mit Interaktion und RG wieder.
+\item Erläutern Sie die Bedeutung der Parameter $\mu_0,\alpha_2, \beta_2$ und $\gamma_{22}$ im Modell der ZVA mit Interaktion und RG.
+\item Geben Sie die Designmatrixform des Modells einer 2 x 2 ZVA mit Interaktion und RG für $n_{ij} := 1$ an.
+\item Geben Sie die Designmatrixform des Modells einer 2 x 2 ZVA mit Interaktion und RG für $n_{ij} := 3$ an.
+\item Geben Sie das Theorem zur Betaparameterschätzung im additiven 2 x 2 ZVA Modell mit RG wieder.
+\item Geben Sie das Theorem zur Betaparameterschätzung im 2 x 2 ZVA Modell mit Interaktion und RG wieder.
+\end{enumerate}
+
+# Selbstkontrollfragen
+\footnotesize
+\begin{enumerate}
+\setcounter{enumi}{15}
+\justifying
+\item Erzeugen Sie einen Beispieldatensatz des Anwendungsbeispiels einer 2 x 2 ZVA 
+mit den Faktoren Therapie (F2F, ONL) und Alter (YA,OA) basierend
+auf dem Modell der ZVA mit Interaktion und Referenzgruppe für von Ihnen selbst gewählte
+Parameterwerte $\mu_0,\alpha_2,\beta_2,\gamma_{22}$ und $\sigma^2$. Visualisieren
+Sie den erzeugten Datensatz mithilfe eines Barplots, eines Barplots und eines Lineplots.
+\item Bestimmen Sie Betaparameterschätzer für den von Ihnen erzeugten Datensatz im
+Modell der additiven 2 x 2 ZVA mit Referenzgruppe und im Modell der 2 x 2 mit Interaktion und Referenzgruppe. 
+Erläutern Sie die Gemeinsamkeiten und Unterschiede der Betaparameterschätzer vor dem
+Hintergrund der von Ihnen gewählten wahren, aber unbekannten, Parameterwerte des Datensatzes.
+\item Führen Sie basierend auf dem von Ihnen erzeugten Datensatz einen F-Test für den Haupteffekt
+des Faktors Therapie, einen F-Test für den Haupteffekt des Faktors Alter und einen F-Test für
+die Interaktion der Faktoren durch. Dokumentieren und erläutern Sie Ihre Ergebnisse.
+\end{enumerate}

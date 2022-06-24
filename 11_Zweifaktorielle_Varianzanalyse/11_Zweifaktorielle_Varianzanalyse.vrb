@@ -1,0 +1,60 @@
+\frametitle{\small Modellevaluation \textbar {} Interaktion im Modell der 2 x 2 ZVA mit Interaktion und Referenzgruppe}
+\protect\hypertarget{modellevaluation-interaktion-im-modell-der-2-x-2-zva-mit-interaktion-und-referenzgruppe-2}{}
+\small
+
+\textcolor{darkblue}{Interaktion im Modell der 2 x 2 ZVA mit Interaktion mit R's aov() Funktion}
+\tiny \setstretch{.8} \vspace{1mm}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Dateneinlesen}
+\NormalTok{fname      }\OtherTok{=} \FunctionTok{file.path}\NormalTok{(}\FunctionTok{getwd}\NormalTok{(), }\StringTok{"11\_Daten"}\NormalTok{, }\StringTok{"11\_Zweifaktorielle\_Varianzanalyse\_Daten.csv"}\NormalTok{)}
+\NormalTok{D          }\OtherTok{=} \FunctionTok{read.table}\NormalTok{(fname, }\AttributeTok{sep =} \StringTok{","}\NormalTok{, }\AttributeTok{header =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# R\textquotesingle{}s aov Funktion}
+\NormalTok{res.aov    }\OtherTok{=} \FunctionTok{aov}\NormalTok{(BDI }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Therapy }\SpecialCharTok{+}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ Age}\SpecialCharTok{:}\NormalTok{Therapy, }\AttributeTok{data =}\NormalTok{ D)  }\CommentTok{\# Modellformulierung und Modellschätzung}
+\FunctionTok{summary}\NormalTok{(res.aov)                                               }\CommentTok{\# Modellevaluation}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+>             Df Sum Sq Mean Sq F value  Pr(>F)
+> Therapy      1    329     329   98.18 2.5e-15 ***
+> Age          1     12      12    3.50   0.065 .
+> Therapy:Age  1     14      14    4.21   0.044 *
+> Residuals   76    255       3
+> ---
+> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\vspace{2mm}
+
+\small
+
+\textcolor{darkblue}{Interaktion im Modell der 2 x 2 ZVA mit Interaktion mit R's lm() und anova() Funktionen}
+\tiny \setstretch{.8} \vspace{1mm}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Dateneinlesen}
+\NormalTok{fname      }\OtherTok{=} \FunctionTok{file.path}\NormalTok{(}\FunctionTok{getwd}\NormalTok{(), }\StringTok{"11\_Daten"}\NormalTok{, }\StringTok{"11\_Zweifaktorielle\_Varianzanalyse\_Daten.csv"}\NormalTok{)}
+\NormalTok{D          }\OtherTok{=} \FunctionTok{read.table}\NormalTok{(fname, }\AttributeTok{sep =} \StringTok{","}\NormalTok{, }\AttributeTok{header =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# R\textquotesingle{}s lm (linear model) und anova() Funktionen}
+\NormalTok{glm        }\OtherTok{=} \FunctionTok{lm}\NormalTok{(BDI }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Therapy }\SpecialCharTok{+}\NormalTok{ Age }\SpecialCharTok{+}\NormalTok{ Therapy}\SpecialCharTok{:}\NormalTok{Age, }\AttributeTok{data =}\NormalTok{ D)   }\CommentTok{\# Modellformulierung und Modellschätzung}
+\FunctionTok{anova}\NormalTok{(glm)                                                     }\CommentTok{\# Modellevaluation}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+> Analysis of Variance Table
+>
+> Response: BDI
+>             Df Sum Sq Mean Sq F value  Pr(>F)
+> Therapy      1    329     329   98.18 2.5e-15 ***
+> Age          1     12      12    3.50   0.065 .
+> Therapy:Age  1     14      14    4.21   0.044 *
+> Residuals   76    255       3
+> ---
+> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
